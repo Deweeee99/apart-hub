@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/data/demo_data.dart';
-import '../../core/widgets/digital_access_step_indicator.dart';
 import '../../core/widgets/luxury_button.dart';
 import '../../core/widgets/premium_qr_card.dart';
+import '../../core/widgets/premium_step_indicator.dart';
 import '../../core/widgets/status_badge.dart';
 import '../../core/widgets/white_premium_card.dart';
 
@@ -124,7 +124,7 @@ class _DigitalAccessPageState extends State<DigitalAccessPage> {
         children: [
           _buildFlowHeader(),
           const SizedBox(height: 14),
-          DigitalAccessStepIndicator(
+          PremiumStepIndicator(
             currentStep: _accessStep,
             steps: const [
               'Select',
