@@ -14,6 +14,7 @@ import '../../core/widgets/qr_preview_card.dart';
 import '../../core/widgets/role_scaffold.dart';
 import '../../core/widgets/section_header.dart';
 import '../../core/widgets/status_badge.dart';
+import '../../core/widgets/quick_access_item.dart';
 
 final _currency = NumberFormat.currency(
   locale: 'id_ID',
@@ -36,7 +37,13 @@ class _ResidentShellState extends State<ResidentShell> {
   @override
   Widget build(BuildContext context) {
     final pages = [
-      const ResidentDashboardPage(),
+      ResidentDashboardPage(
+        onNavigate: (newIndex) {
+          setState(() {
+            _index = newIndex;
+          });
+        },
+      ),
       const DigitalAccessPage(),
       const BillingPaymentPage(),
       const ResidentServicePage(),
@@ -83,7 +90,10 @@ class _ResidentShellState extends State<ResidentShell> {
 }
 
 class ResidentDashboardPage extends StatelessWidget {
-  const ResidentDashboardPage({super.key});
+
+  final Function(int) onNavigate;
+  const ResidentDashboardPage({super.key, required this.onNavigate});
+  
 
   @override
   Widget build(BuildContext context) {
@@ -99,6 +109,7 @@ class ResidentDashboardPage extends StatelessWidget {
       key: const ValueKey('resident-dashboard'),
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
       children: [
+        // --- 1. GREETING CARD ---
         GlassCard(
           padding: const EdgeInsets.all(22),
           child: Column(
@@ -148,6 +159,64 @@ class ResidentDashboardPage extends StatelessWidget {
             ],
           ),
         ).animate().fadeIn(duration: 420.ms).moveY(begin: 16, end: 0),
+        
+        const SizedBox(height: 16), // Jarak antar card
+
+        // --- 2. QUICK ACCESS CARD (YANG BARU DI-UPDATE) ---
+        GlassCard(
+          padding: const EdgeInsets.all(22),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Quick Access',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textPrimary,
+                    ),
+              ),
+              const SizedBox(height: 18),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  QuickAccessItem(
+                    icon: Icons.qr_code_2_outlined,
+                    label: 'QR Pass',
+                    onTap: () {
+                      onNavigate(1);
+                    },
+                  ),
+                  QuickAccessItem(
+                    icon: Icons.receipt_long_outlined,
+                    label: 'Pay Bill',
+                    onTap: () {
+                      onNavigate(2);
+                    },
+                  ),
+                  QuickAccessItem(
+                    icon: Icons.event_available_outlined,
+                    label: 'Facility',
+                    onTap: () {
+                      onNavigate(3);
+                    },
+                  ),
+                 QuickAccessItem(
+                    icon: Icons.forum_outlined, // Icon chat/forum yang pas buat community
+                    label: 'Community',
+                    onTap: () {
+                      onNavigate(4); // Arahin ke Index 4 (Community)
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ).animate().fadeIn(delay: 200.ms, duration: 420.ms).moveY(begin: 16, end: 0),
+        // ---------------------------------------------------
+
+        const SizedBox(height: 16),
+
+        // --- 3. TODAY SUMMARY & LAINNYA ---
         const SectionHeader(title: 'Today Summary'),
         GridView.count(
           shrinkWrap: true,

@@ -44,7 +44,7 @@ class RoleScaffold extends StatelessWidget {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Apartemen Meikarta'),
+              const Text('Apart Hub'),
               Text(
                 roleLabel,
                 style: Theme.of(
@@ -55,10 +55,10 @@ class RoleScaffold extends StatelessWidget {
           ),
           actions: [
             IconButton(
-              tooltip: 'Switch role',
-              onPressed: () => context.go('/roles'),
+              tooltip: 'logout',
+              onPressed: () => context.go('/login'),
               icon: const Icon(
-                Icons.swap_horiz_outlined,
+                Icons.exit_to_app_outlined,
                 color: AppColors.softGold,
               ),
             ),

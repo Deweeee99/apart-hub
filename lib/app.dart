@@ -8,6 +8,7 @@ import 'features/role_selection/role_selection_screen.dart';
 import 'features/role_selection/splash_screen.dart';
 import 'features/security/security_shell.dart';
 import 'features/tenant/tenant_shell.dart';
+import 'features/role_selection/dummy_login_page.dart';
 
 class AureliaApp extends StatelessWidget {
   const AureliaApp({super.key});
@@ -21,6 +22,10 @@ class AureliaApp extends StatelessWidget {
         GoRoute(
           path: '/roles',
           builder: (context, state) => const RoleSelectionScreen(),
+        ),
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => const DummyLoginPage(),
         ),
         GoRoute(
           path: '/resident',
@@ -42,7 +47,7 @@ class AureliaApp extends StatelessWidget {
     );
 
     return MaterialApp.router(
-      title: 'Apartemen Meikarta',
+      title: 'Apart Hub',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkLuxuryTheme,
       routerConfig: router,

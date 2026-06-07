@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Future.delayed(const Duration(milliseconds: 1800), () {
       if (mounted) {
-        context.go('/roles');
+        context.go('/login');
       }
     });
   }
@@ -35,43 +35,46 @@ class _SplashScreenState extends State<SplashScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Spacer(),
+                
+                // --- Bagian Logo yang diupdate ---
                 Container(
-                      width: 96,
-                      height: 96,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        gradient: const LinearGradient(
-                          colors: [AppColors.softGold, AppColors.goldMetallic],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
+                  width: 96,
+                  height: 96,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    // Gradient dihapus biar warna bawaan logo gak ketiban
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.goldMetallic.withValues(
+                          alpha: 0.30,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.goldMetallic.withValues(
-                              alpha: 0.30,
-                            ),
-                            blurRadius: 36,
-                            offset: const Offset(0, 20),
-                          ),
-                        ],
+                        blurRadius: 36,
+                        offset: const Offset(0, 20),
                       ),
-                      child: const Icon(
-                        Icons.apartment_outlined,
-                        color: Color(0xFF151106),
-                        size: 48,
-                      ),
-                    )
-                    .animate(
-                      onPlay: (controller) => controller.repeat(reverse: true),
-                    )
-                    .scale(
-                      begin: const Offset(0.96, 0.96),
-                      end: const Offset(1.04, 1.04),
-                      duration: 1100.ms,
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30),
+                    child: Image.asset(
+                      "assets/images/apartHub-logo.png",
+                      fit: BoxFit.cover, // Ganti ke contain kalau dirasa kepotong
                     ),
+                  ),
+                )
+                // Efek denyut (pulse) tetep jalan
+                .animate(
+                  onPlay: (controller) => controller.repeat(reverse: true),
+                )
+                .scale(
+                  begin: const Offset(0.96, 0.96),
+                  end: const Offset(1.04, 1.04),
+                  duration: 1100.ms,
+                ),
+                // ---------------------------------
+
                 const SizedBox(height: 28),
                 Text(
-                  'Apartemen Meikarta',
+                  'Apart Hub',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w900,
