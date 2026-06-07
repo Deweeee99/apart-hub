@@ -268,11 +268,11 @@ class _DigitalAccessPageState extends State<DigitalAccessPage> {
   final _phoneController = TextEditingController(text: '+62 812 2211 0077');
   final _scheduleController = TextEditingController(text: '5 Jun 2026, 19:00');
   final _vehicleController = TextEditingController(text: 'B 1808 GOLD');
-  final _qrTypes = const [
-    'QR Visitor',
-    'QR Parking',
-    'QR Delivery',
-    'QR Guest',
+  final _accessTypes = const [
+    'Visitor Access',
+    'Parking Access',
+    'Delivery Access',
+    'Guest Access',
   ];
   final _purposes = const [
     'Family Visit',
@@ -280,10 +280,64 @@ class _DigitalAccessPageState extends State<DigitalAccessPage> {
     'Delivery',
     'Private Guest',
   ];
-  var _selectedQr = 'QR Visitor';
+  late final List<
+    ({
+      String accessType,
+      String detail,
+      DateTime dateTime,
+      String name,
+      String purpose,
+      String status,
+      String unit,
+    })
+  >
+  _accessHistory = [
+    for (final visitor in DemoData.visitors)
+      (
+        accessType: visitor.purpose == 'Delivery'
+            ? 'Delivery Access'
+            : 'Visitor Access',
+        detail: visitor.phone,
+        dateTime: visitor.visitTime,
+        name: visitor.name,
+        purpose: visitor.purpose,
+        status: visitor.status == 'Upcoming' ? 'Approved' : visitor.status,
+        unit: visitor.unit,
+      ),
+    (
+      accessType: 'Parking Access',
+      detail: 'B 1234 ABC',
+      dateTime: DateTime(2026, 6, 6, 16, 15),
+      name: 'Andrew Wijaya',
+      purpose: 'Parking',
+      status: 'Approved',
+      unit: DemoData.primaryResident.unit.label,
+    ),
+    (
+      accessType: 'Delivery Access',
+      detail: 'DHL Express',
+      dateTime: DateTime(2026, 6, 5, 11, 20),
+      name: 'DHL Express',
+      purpose: 'Delivery',
+      status: 'Used',
+      unit: DemoData.primaryResident.unit.label,
+    ),
+    (
+      accessType: 'Guest Access',
+      detail: '+62 811 4455 9000',
+      dateTime: DateTime(2026, 6, 2, 9, 45),
+      name: 'Sarah Lim',
+      purpose: 'Private Guest',
+      status: 'Expired',
+      unit: DemoData.primaryResident.unit.label,
+    ),
+  ];
+
+  var _accessStep = 0;
+  var _selectedAccessType = 'Visitor Access';
+  var _historyFilter = 'All Access';
   var _selectedPurpose = 'Family Visit';
   var _generatedCode = 'VIS-A1808-2026-001';
-  var _visitorFilter = 'Upcoming';
 
   @override
   void dispose() {
@@ -296,128 +350,756 @@ class _DigitalAccessPageState extends State<DigitalAccessPage> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredVisitors = DemoData.visitors
-        .where((item) => item.status == _visitorFilter)
-        .toList();
-
     return _ResidentSurface(
       child: ListView(
         key: const ValueKey('resident-access'),
         padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
         children: [
-          const _ResidentHeader(
-            title: 'Digital Access',
-            subtitle: 'Secure, seamless, and contactless entry',
-            icon: Icons.qr_code_2_outlined,
-          ),
+          _buildFlowHeader(),
           const SizedBox(height: 14),
-          const _FlowStepStrip(
-            steps: [
-              'Select Type',
-              'Generate QR',
-              'Share Access',
-              'Verify',
-              'Granted',
-              'History',
-            ],
-          ),
+          _buildStepIndicator(),
           const SizedBox(height: 16),
-          _WhitePremiumCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const _CardTitle(
-                  title: 'Generate QR Pass',
-                  subtitle:
-                      'Create a temporary pass for visitor, parking, or delivery access.',
-                  icon: Icons.mobile_friendly_outlined,
-                ),
-                const SizedBox(height: 16),
-                _ChoiceWrap(
-                  items: _qrTypes,
-                  selected: _selectedQr,
-                  onSelected: (value) => setState(() => _selectedQr = value),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Guest / courier name',
-                  ),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: _phoneController,
-                  decoration: const InputDecoration(labelText: 'Phone number'),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: _vehicleController,
-                  decoration: const InputDecoration(
-                    labelText: 'Vehicle / delivery detail',
-                  ),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: _scheduleController,
-                  decoration: const InputDecoration(labelText: 'Date and time'),
-                ),
-                const SizedBox(height: 14),
-                _ChoiceWrap(
-                  items: _purposes,
-                  selected: _selectedPurpose,
-                  onSelected: (value) =>
-                      setState(() => _selectedPurpose = value),
-                ),
-                const SizedBox(height: 16),
-                LuxuryButton(
-                  label: 'Generate QR Code',
-                  icon: Icons.qr_code_2_outlined,
-                  onPressed: () {
-                    final prefix = switch (_selectedQr) {
-                      'QR Parking' => 'PAR',
-                      'QR Delivery' => 'DEL',
-                      'QR Guest' => 'GST',
-                      _ => 'VIS',
-                    };
-                    setState(() => _generatedCode = '$prefix-A1808-2026-001');
-                  },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 14),
-          _PremiumQrCard(
-            code: _generatedCode,
-            title: '$_selectedQr Pass',
-            subtitle:
-                '${_nameController.text} - $_selectedPurpose - ${_scheduleController.text}',
-            onShare: () => ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Share QR simulated for ${_nameController.text}.',
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          _SectionTitle(
-            title: 'Visitor Management',
-            actionLabel: 'History',
-            icon: Icons.manage_accounts_outlined,
-          ),
-          _ChoiceWrap(
-            items: const ['Upcoming', 'Used', 'Expired'],
-            selected: _visitorFilter,
-            onSelected: (value) => setState(() => _visitorFilter = value),
-          ),
-          const SizedBox(height: 12),
-          for (final visitor in filteredVisitors)
-            _VisitorPassCard(visitor: visitor),
+          _buildStepContent(),
         ],
       ),
     );
   }
+
+  void _goToStep(int step) {
+    setState(() => _accessStep = step.clamp(0, 5));
+  }
+
+  void _resetAccessFlow() {
+    setState(() {
+      _accessStep = 0;
+      _selectedAccessType = 'Visitor Access';
+      _selectedPurpose = 'Family Visit';
+      _generatedCode = 'VIS-A1808-2026-001';
+    });
+  }
+
+  Widget _buildFlowHeader() {
+    return const _ResidentHeader(
+      title: 'Digital Access',
+      subtitle: 'Secure, seamless, and contactless entry',
+      icon: Icons.qr_code_2_outlined,
+    );
+  }
+
+  Widget _buildStepIndicator() {
+    final steps = const [
+      'Select',
+      'Generate',
+      'Share',
+      'Verify',
+      'Granted',
+      'History',
+    ];
+    return SizedBox(
+      height: 82,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: steps.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        itemBuilder: (context, index) {
+          final isActive = index == _accessStep;
+          final isComplete = index < _accessStep;
+          return Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () => _goToStep(index),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                width: 108,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isActive ? _residentSoftGold : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isActive || isComplete
+                        ? _residentGold.withValues(alpha: 0.56)
+                        : _residentLine,
+                  ),
+                  boxShadow: [
+                    if (isActive)
+                      BoxShadow(
+                        color: _residentGold.withValues(alpha: 0.14),
+                        blurRadius: 18,
+                        offset: const Offset(0, 10),
+                      ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 26,
+                      height: 26,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: isActive || isComplete
+                            ? _residentGold
+                            : _residentSoftGray,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        '${index + 1}',
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: isActive || isComplete
+                              ? Colors.white
+                              : _residentMuted,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      steps[index],
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: isActive ? _residentNavy : _residentMuted,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildStepContent() {
+    return switch (_accessStep) {
+      0 => _buildSelectAccessType(),
+      1 => _buildGenerateQrForm(),
+      2 => _buildShareAccess(),
+      3 => _buildScanVerify(),
+      4 => _buildAccessGranted(),
+      _ => _buildAccessHistory(),
+    };
+  }
+
+  Widget _buildSelectAccessType() {
+    final resident = DemoData.primaryResident;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _WhitePremiumCard(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              _GoldIcon(icon: Icons.person_pin_circle_outlined, size: 44),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      resident.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: _residentNavy,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      resident.unit.label,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: _residentMuted),
+                    ),
+                  ],
+                ),
+              ),
+              StatusBadge(status: resident.accessStatus),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        for (final accessType in _accessTypes) ...[
+          _buildAccessTypeCard(accessType),
+          const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildGenerateQrForm() {
+    return _WhitePremiumCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _CardTitle(
+            title: 'Generate QR Code',
+            subtitle:
+                'Create a secure temporary pass for $_selectedAccessType.',
+            icon: _accessIcon(_selectedAccessType),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _nameController,
+            decoration: const InputDecoration(
+              labelText: 'Guest / courier name',
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: _phoneController,
+            decoration: const InputDecoration(labelText: 'Phone number'),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: _vehicleController,
+            decoration: const InputDecoration(
+              labelText: 'Vehicle / delivery detail',
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: _scheduleController,
+            decoration: const InputDecoration(labelText: 'Date and time'),
+          ),
+          const SizedBox(height: 14),
+          _ChoiceWrap(
+            items: _purposes,
+            selected: _selectedPurpose,
+            onSelected: (value) => setState(() => _selectedPurpose = value),
+          ),
+          const SizedBox(height: 16),
+          LuxuryButton(
+            label: 'Generate QR Code',
+            icon: Icons.qr_code_2_outlined,
+            onPressed: () {
+              final sequence = (_accessHistory.length + 1).toString().padLeft(
+                3,
+                '0',
+              );
+              setState(() {
+                _generatedCode =
+                    '${_accessPrefix(_selectedAccessType)}-A1808-2026-$sequence';
+                _accessStep = 2;
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShareAccess() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _PremiumQrCard(
+          code: _generatedCode,
+          title: '$_selectedAccessType Pass',
+          subtitle:
+              '${_nameController.text} - $_selectedPurpose - ${_scheduleController.text}',
+          onShare: () => _showAccessSnack(
+            'Share QR simulated for ${_nameController.text}.',
+          ),
+        ),
+        const SizedBox(height: 14),
+        _WhitePremiumCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const _CardTitle(
+                title: 'Share Access',
+                subtitle: 'Send the QR code to the visitor, guest, or driver.',
+                icon: Icons.ios_share_outlined,
+              ),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: () => _showAccessSnack(
+                  'WhatsApp share simulated for ${_nameController.text}.',
+                ),
+                icon: const Icon(Icons.chat_outlined),
+                label: const Text('Share via WhatsApp'),
+              ),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                onPressed: () => _showAccessSnack(
+                  'Email share simulated for ${_nameController.text}.',
+                ),
+                icon: const Icon(Icons.email_outlined),
+                label: const Text('Share via Email'),
+              ),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                onPressed: () =>
+                    _showAccessSnack('Access link copied for $_generatedCode.'),
+                icon: const Icon(Icons.link_outlined),
+                label: const Text('Copy Link'),
+              ),
+              const SizedBox(height: 16),
+              LuxuryButton(
+                label: 'Continue to Verify',
+                icon: Icons.verified_user_outlined,
+                onPressed: () => _goToStep(3),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildScanVerify() {
+    return _WhitePremiumCard(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          const _GoldIcon(icon: Icons.shield_outlined, size: 56),
+          const SizedBox(height: 16),
+          Text(
+            'Scanning QR Code',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: _residentNavy,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Security scans and verifies access instantly.',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: _residentMuted,
+              height: 1.35,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              border: Border.all(color: _residentGold.withValues(alpha: 0.42)),
+              boxShadow: [
+                BoxShadow(
+                  color: _residentGold.withValues(alpha: 0.10),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: QrImageView(
+              data: _generatedCode,
+              version: QrVersions.auto,
+              size: 118,
+              backgroundColor: Colors.white,
+              eyeStyle: const QrEyeStyle(color: Colors.black),
+              dataModuleStyle: const QrDataModuleStyle(color: Colors.black),
+            ),
+          ),
+          const SizedBox(height: 20),
+          _buildAccessSummary(status: 'Valid Access'),
+          const SizedBox(height: 18),
+          LuxuryButton(
+            label: 'Verify Access',
+            icon: Icons.fact_check_outlined,
+            onPressed: () => _goToStep(4),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAccessGranted() {
+    return _WhitePremiumCard(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          Container(
+            width: 86,
+            height: 86,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8F7EE),
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xFF2DAE62)),
+            ),
+            child: const Icon(
+              Icons.check_rounded,
+              color: Color(0xFF218D4F),
+              size: 54,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text(
+            'Access Granted!',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: const Color(0xFF218D4F),
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Gate opened successfully.',
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: _residentMuted),
+          ),
+          const SizedBox(height: 20),
+          _buildAccessSummary(status: 'Approved'),
+          const SizedBox(height: 18),
+          LuxuryButton(
+            label: 'Done',
+            icon: Icons.done_all_outlined,
+            onPressed: () {
+              setState(() {
+                _accessHistory.insert(0, _currentAccessHistoryRecord());
+                _accessStep = 5;
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAccessHistory() {
+    final filtered =
+        _accessHistory
+            .where(
+              (item) =>
+                  _historyFilter == 'All Access' ||
+                  item.accessType.startsWith(_historyFilter),
+            )
+            .toList()
+          ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
+    final today = filtered
+        .where((item) => _isSameDay(item.dateTime, _historyToday))
+        .toList();
+    final yesterday = filtered
+        .where((item) => _isSameDay(item.dateTime, _historyYesterday))
+        .toList();
+    final older = filtered
+        .where(
+          (item) =>
+              !_isSameDay(item.dateTime, _historyToday) &&
+              !_isSameDay(item.dateTime, _historyYesterday),
+        )
+        .toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _WhitePremiumCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const _CardTitle(
+                title: 'Access History',
+                subtitle: 'All access records are stored and traceable.',
+                icon: Icons.history_outlined,
+              ),
+              const SizedBox(height: 16),
+              _ChoiceWrap(
+                items: const [
+                  'All Access',
+                  'Visitor',
+                  'Parking',
+                  'Delivery',
+                  'Guest',
+                ],
+                selected: _historyFilter,
+                onSelected: (value) => setState(() => _historyFilter = value),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        _buildHistorySection('Today', today),
+        _buildHistorySection('Yesterday', yesterday),
+        _buildHistorySection('Older', older),
+        const SizedBox(height: 4),
+        OutlinedButton.icon(
+          onPressed: () =>
+              _showAccessSnack('Access history download simulated.'),
+          icon: const Icon(Icons.download_outlined),
+          label: const Text('Download History'),
+        ),
+        const SizedBox(height: 10),
+        LuxuryButton(
+          label: 'Create New Access',
+          icon: Icons.add_circle_outline,
+          onPressed: _resetAccessFlow,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAccessTypeCard(String accessType) {
+    return _WhitePremiumCard(
+      padding: const EdgeInsets.all(16),
+      onTap: () {
+        setState(() {
+          _selectedAccessType = accessType;
+          _selectedPurpose = switch (accessType) {
+            'Delivery Access' => 'Delivery',
+            'Guest Access' => 'Private Guest',
+            'Parking Access' => 'Business',
+            _ => 'Family Visit',
+          };
+          _accessStep = 1;
+        });
+      },
+      child: Row(
+        children: [
+          _GoldIcon(icon: _accessIcon(accessType), size: 44),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  accessType,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: _residentNavy,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _accessSubtitle(accessType),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: _residentMuted,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.chevron_right, color: _residentGold),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAccessSummary({required String status}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: _residentSoftGray,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _residentLine),
+      ),
+      child: Column(
+        children: [
+          _buildDetailRow('Status', status),
+          const SizedBox(height: 8),
+          _buildDetailRow('Name', _nameController.text),
+          const SizedBox(height: 8),
+          _buildDetailRow('Purpose', _selectedPurpose),
+          const SizedBox(height: 8),
+          _buildDetailRow('Unit', DemoData.primaryResident.unit.label),
+          const SizedBox(height: 8),
+          _buildDetailRow('Access Type', _selectedAccessType),
+          const SizedBox(height: 8),
+          _buildDetailRow('Code', _generatedCode),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: _residentMuted,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: _residentNavy,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHistorySection(
+    String title,
+    List<
+      ({
+        String accessType,
+        String detail,
+        DateTime dateTime,
+        String name,
+        String purpose,
+        String status,
+        String unit,
+      })
+    >
+    items,
+  ) {
+    if (items.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(2, 8, 2, 10),
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: _residentNavy,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ),
+        for (final item in items) _buildHistoryCard(item),
+      ],
+    );
+  }
+
+  Widget _buildHistoryCard(
+    ({
+      String accessType,
+      String detail,
+      DateTime dateTime,
+      String name,
+      String purpose,
+      String status,
+      String unit,
+    })
+    item,
+  ) {
+    return _WhitePremiumCard(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _GoldIcon(icon: _accessIcon(item.accessType), size: 42),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.accessType,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: _residentNavy,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${item.name} - ${item.detail}',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: _residentMuted,
+                    height: 1.35,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  '${_date.format(item.dateTime)} at ${_time.format(item.dateTime)}',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: _residentMuted,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          StatusBadge(status: item.status),
+        ],
+      ),
+    );
+  }
+
+  ({
+    String accessType,
+    String detail,
+    DateTime dateTime,
+    String name,
+    String purpose,
+    String status,
+    String unit,
+  })
+  _currentAccessHistoryRecord() {
+    return (
+      accessType: _selectedAccessType,
+      detail: _vehicleController.text.isEmpty
+          ? _phoneController.text
+          : _vehicleController.text,
+      dateTime: _historyToday.add(const Duration(hours: 10, minutes: 30)),
+      name: _nameController.text,
+      purpose: _selectedPurpose,
+      status: 'Approved',
+      unit: DemoData.primaryResident.unit.label,
+    );
+  }
+
+  void _showAccessSnack(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  IconData _accessIcon(String accessType) {
+    return switch (accessType) {
+      'Parking Access' => Icons.local_parking_outlined,
+      'Delivery Access' => Icons.inventory_2_outlined,
+      'Guest Access' => Icons.group_outlined,
+      _ => Icons.person_add_alt_1_outlined,
+    };
+  }
+
+  String _accessPrefix(String accessType) {
+    return switch (accessType) {
+      'Parking Access' => 'PAR',
+      'Delivery Access' => 'DEL',
+      'Guest Access' => 'GST',
+      _ => 'VIS',
+    };
+  }
+
+  String _accessSubtitle(String accessType) {
+    return switch (accessType) {
+      'Parking Access' => 'Access to parking area',
+      'Delivery Access' => 'For parcel or delivery pickup',
+      'Guest Access' => 'Access for invited guest',
+      _ => 'Allow visitors to enter the residence',
+    };
+  }
+
+  bool _isSameDay(DateTime left, DateTime right) {
+    return left.year == right.year &&
+        left.month == right.month &&
+        left.day == right.day;
+  }
+
+  DateTime get _historyToday => DateTime(2026, 6, 7);
+
+  DateTime get _historyYesterday =>
+      _historyToday.subtract(const Duration(days: 1));
 }
 
 class BillingPaymentPage extends StatefulWidget {
@@ -1899,6 +2581,7 @@ class _PremiumQrCard extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _VisitorPassCard extends StatelessWidget {
   const _VisitorPassCard({required this.visitor});
 
