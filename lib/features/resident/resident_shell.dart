@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/data/demo_data.dart';
 import '../../core/models/app_models.dart';
 import '../../core/widgets/emergency_button.dart';
-import '../../core/widgets/glass_card.dart';
 import '../../core/widgets/luxury_button.dart';
-import '../../core/widgets/metric_card.dart';
-import '../../core/widgets/premium_list_tile.dart';
-import '../../core/widgets/qr_preview_card.dart';
 import '../../core/widgets/role_scaffold.dart';
-import '../../core/widgets/section_header.dart';
 import '../../core/widgets/status_badge.dart';
-import '../../core/widgets/quick_access_item.dart';
 
 final _currency = NumberFormat.currency(
   locale: 'id_ID',
@@ -23,6 +18,15 @@ final _currency = NumberFormat.currency(
 );
 final _date = DateFormat('d MMM yyyy', 'id_ID');
 final _time = DateFormat('HH:mm', 'id_ID');
+
+const _residentBackground = Color(0xFFFAF8F2);
+const _residentCard = Colors.white;
+const _residentNavy = Color(0xFF071B34);
+const _residentGold = Color(0xFFC08A1A);
+const _residentSoftGold = Color(0xFFFFF6DF);
+const _residentMuted = Color(0xFF687184);
+const _residentLine = Color(0xFFE7DFD1);
+const _residentSoftGray = Color(0xFFF2F0EA);
 
 class ResidentShell extends StatefulWidget {
   const ResidentShell({super.key});
@@ -90,10 +94,9 @@ class _ResidentShellState extends State<ResidentShell> {
 }
 
 class ResidentDashboardPage extends StatelessWidget {
+  const ResidentDashboardPage({super.key, required this.onNavigate});
 
   final Function(int) onNavigate;
-  const ResidentDashboardPage({super.key, required this.onNavigate});
-  
 
   @override
   Widget build(BuildContext context) {
@@ -105,169 +108,150 @@ class ResidentDashboardPage extends StatelessWidget {
         .where((item) => item.status == 'Waiting Pickup')
         .length;
 
-    return ListView(
-      key: const ValueKey('resident-dashboard'),
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
-      children: [
-        // --- 1. GREETING CARD ---
-        GlassCard(
-          padding: const EdgeInsets.all(22),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return _ResidentSurface(
+      child: ListView(
+        key: const ValueKey('resident-dashboard'),
+        padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
+        children: [
+          _ResidentHeroCard(
+            resident: resident,
+            activeBill: activeBill,
+          ).animate().fadeIn(duration: 420.ms).moveY(begin: 16, end: 0),
+          const SizedBox(height: 18),
+          _SectionTitle(
+            title: 'Quick Actions',
+            actionLabel: '4 shortcuts',
+            icon: Icons.flash_on_outlined,
+          ),
+          _ResponsiveGrid(
+            minTileWidth: 132,
+            spacing: 12,
+            childAspectRatio: 0.72,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Good Evening, Jonathan',
-                          style: Theme.of(context).textTheme.headlineMedium
-                              ?.copyWith(fontWeight: FontWeight.w900),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Your residence, billing, access, and concierge flow in one private dashboard.',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Icon(
-                    Icons.nights_stay_outlined,
-                    color: AppColors.softGold,
-                    size: 34,
-                  ),
-                ],
+              _ResidentActionCard(
+                icon: Icons.qr_code_2_outlined,
+                title: 'Digital Access',
+                subtitle: 'Visitor, parking',
+                onTap: () => onNavigate(1),
               ),
-              const SizedBox(height: 18),
-              Row(
-                children: [
-                  Expanded(
-                    child: _TinyInfo(label: 'Unit', value: resident.unit.label),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _TinyInfo(
-                      label: 'Status',
-                      value: resident.residencyStatus,
-                    ),
-                  ),
-                ],
+              _ResidentActionCard(
+                icon: Icons.payments_outlined,
+                title: 'Pay Bill',
+                subtitle: 'Invoices & dues',
+                onTap: () => onNavigate(2),
+              ),
+              _ResidentActionCard(
+                icon: Icons.event_available_outlined,
+                title: 'Facility',
+                subtitle: 'Book amenity',
+                onTap: () => onNavigate(3),
+              ),
+              _ResidentActionCard(
+                icon: Icons.forum_outlined,
+                title: 'Community',
+                subtitle: 'Forum & events',
+                onTap: () => onNavigate(4),
               ),
             ],
           ),
-        ).animate().fadeIn(duration: 420.ms).moveY(begin: 16, end: 0),
-        
-        const SizedBox(height: 16), // Jarak antar card
-
-        // --- 2. QUICK ACCESS CARD (YANG BARU DI-UPDATE) ---
-        GlassCard(
-          padding: const EdgeInsets.all(22),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(height: 20),
+          _SectionTitle(
+            title: 'Latest Services',
+            actionLabel: 'View all',
+            icon: Icons.apps_outlined,
+          ),
+          _ResponsiveGrid(
+            minTileWidth: 148,
+            spacing: 12,
+            childAspectRatio: 0.74,
             children: [
-              Text(
-                'Quick Access',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.textPrimary,
-                    ),
+              _MiniFeatureTile(
+                icon: Icons.receipt_long_outlined,
+                title: 'Billing & Payment',
+                subtitle: 'Review active invoice',
+                onTap: () => onNavigate(2),
               ),
-              const SizedBox(height: 18),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  QuickAccessItem(
-                    icon: Icons.qr_code_2_outlined,
-                    label: 'QR Pass',
-                    onTap: () {
-                      onNavigate(1);
-                    },
-                  ),
-                  QuickAccessItem(
-                    icon: Icons.receipt_long_outlined,
-                    label: 'Pay Bill',
-                    onTap: () {
-                      onNavigate(2);
-                    },
-                  ),
-                  QuickAccessItem(
-                    icon: Icons.event_available_outlined,
-                    label: 'Facility',
-                    onTap: () {
-                      onNavigate(3);
-                    },
-                  ),
-                 QuickAccessItem(
-                    icon: Icons.forum_outlined, // Icon chat/forum yang pas buat community
-                    label: 'Community',
-                    onTap: () {
-                      onNavigate(4); // Arahin ke Index 4 (Community)
-                    },
-                  ),
-                ],
+              _MiniFeatureTile(
+                icon: Icons.handyman_outlined,
+                title: 'Service Request',
+                subtitle: 'Track maintenance',
+                onTap: () => onNavigate(3),
+              ),
+              _MiniFeatureTile(
+                icon: Icons.pool_outlined,
+                title: 'Facility Booking',
+                subtitle: 'Reserve premium spaces',
+                onTap: () => onNavigate(3),
+              ),
+              _MiniFeatureTile(
+                icon: Icons.inventory_2_outlined,
+                title: 'Package & Delivery',
+                subtitle: '$waitingPackages waiting pickup',
+                onTap: () => onNavigate(3),
               ),
             ],
           ),
-        ).animate().fadeIn(delay: 200.ms, duration: 420.ms).moveY(begin: 16, end: 0),
-        // ---------------------------------------------------
-
-        const SizedBox(height: 16),
-
-        // --- 3. TODAY SUMMARY & LAINNYA ---
-        const SectionHeader(title: 'Today Summary'),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 1.0,
-          children: [
-            MetricCard(
-              icon: Icons.domain_outlined,
-              label: 'Resident',
-              value: resident.residencyStatus,
-              caption: resident.unit.label,
-            ),
-            MetricCard(
-              icon: Icons.payments_outlined,
-              label: 'Running bill',
-              value: _currency.format(activeBill),
-              caption: 'IPL, listrik, parkir',
-            ),
-            MetricCard(
-              icon: Icons.inventory_2_outlined,
-              label: 'Packages',
-              value: '$waitingPackages Packages',
-              caption: 'Waiting pickup',
-            ),
-            MetricCard(
-              icon: Icons.verified_user_outlined,
-              label: 'IPL status',
-              value: resident.billingStatus,
-              caption: 'Access ${resident.accessStatus}',
-            ),
-          ],
-        ),
-        const SectionHeader(title: 'Latest Announcement'),
-        PremiumListTile(
-          icon: Icons.campaign_outlined,
-          title: DemoData.announcements.first.title,
-          subtitle: DemoData.announcements.first.message,
-          trailing: const StatusBadge(status: 'Maintenance'),
-        ),
-        const SectionHeader(title: 'Emergency'),
-        EmergencyButton(
-          onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Emergency alert simulated for Unit A-1808.'),
+          const SizedBox(height: 20),
+          _SectionTitle(
+            title: 'Today Summary',
+            actionLabel: resident.unit.label,
+            icon: Icons.today_outlined,
+          ),
+          _ResponsiveGrid(
+            minTileWidth: 132,
+            spacing: 12,
+            childAspectRatio: 0.78,
+            children: [
+              _MetricMiniCard(
+                icon: Icons.domain_outlined,
+                label: 'Resident',
+                value: resident.residencyStatus,
+                caption: resident.unit.status,
+              ),
+              _MetricMiniCard(
+                icon: Icons.account_balance_wallet_outlined,
+                label: 'Running bill',
+                value: _currency.format(activeBill),
+                caption: 'IPL, electricity, parking',
+              ),
+              _MetricMiniCard(
+                icon: Icons.inventory_2_outlined,
+                label: 'Packages',
+                value: '$waitingPackages parcels',
+                caption: 'Waiting pickup',
+              ),
+              _MetricMiniCard(
+                icon: Icons.verified_user_outlined,
+                label: 'Access',
+                value: resident.accessStatus,
+                caption: 'Billing ${resident.billingStatus}',
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          _SectionTitle(
+            title: 'Community Hub',
+            actionLabel: 'Latest',
+            icon: Icons.campaign_outlined,
+          ),
+          _WhitePremiumCard(
+            child: _AnnouncementPreview(
+              title: DemoData.announcements.first.title,
+              message: DemoData.announcements.first.message,
+              category: DemoData.announcements.first.category,
+              onTap: () => onNavigate(4),
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: 16),
+          _EmergencyPanel(
+            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Emergency alert simulated for Unit A-1808.'),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -316,119 +300,122 @@ class _DigitalAccessPageState extends State<DigitalAccessPage> {
         .where((item) => item.status == _visitorFilter)
         .toList();
 
-    return ListView(
-      key: const ValueKey('resident-access'),
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
-      children: [
-        const SectionHeader(title: 'Digital Access'),
-        GlassCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Generate QR Pass',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 14),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  for (final type in _qrTypes)
-                    ChoiceChip(
-                      label: Text(type),
-                      selected: _selectedQr == type,
-                      onSelected: (_) => setState(() => _selectedQr = type),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Guest / courier name',
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _phoneController,
-                decoration: const InputDecoration(labelText: 'Phone number'),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _vehicleController,
-                decoration: const InputDecoration(
-                  labelText: 'Vehicle / delivery detail',
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _scheduleController,
-                decoration: const InputDecoration(labelText: 'Date and time'),
-              ),
-              const SizedBox(height: 14),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  for (final purpose in _purposes)
-                    ChoiceChip(
-                      label: Text(purpose),
-                      selected: _selectedPurpose == purpose,
-                      onSelected: (_) =>
-                          setState(() => _selectedPurpose = purpose),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              LuxuryButton(
-                label: 'Generate QR Code',
-                icon: Icons.qr_code_2_outlined,
-                onPressed: () {
-                  final prefix = switch (_selectedQr) {
-                    'QR Parking' => 'PAR',
-                    'QR Delivery' => 'DEL',
-                    'QR Guest' => 'GST',
-                    _ => 'VIS',
-                  };
-                  setState(() => _generatedCode = '$prefix-A1808-2026-001');
-                },
-              ),
+    return _ResidentSurface(
+      child: ListView(
+        key: const ValueKey('resident-access'),
+        padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
+        children: [
+          const _ResidentHeader(
+            title: 'Digital Access',
+            subtitle: 'Secure, seamless, and contactless entry',
+            icon: Icons.qr_code_2_outlined,
+          ),
+          const SizedBox(height: 14),
+          const _FlowStepStrip(
+            steps: [
+              'Select Type',
+              'Generate QR',
+              'Share Access',
+              'Verify',
+              'Granted',
+              'History',
             ],
           ),
-        ),
-        const SizedBox(height: 14),
-        QRPreviewCard(
-          code: _generatedCode,
-          title: '$_selectedQr Pass',
-          onShare: () => ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Share QR simulated for ${_nameController.text}.'),
+          const SizedBox(height: 16),
+          _WhitePremiumCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const _CardTitle(
+                  title: 'Generate QR Pass',
+                  subtitle:
+                      'Create a temporary pass for visitor, parking, or delivery access.',
+                  icon: Icons.mobile_friendly_outlined,
+                ),
+                const SizedBox(height: 16),
+                _ChoiceWrap(
+                  items: _qrTypes,
+                  selected: _selectedQr,
+                  onSelected: (value) => setState(() => _selectedQr = value),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Guest / courier name',
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _phoneController,
+                  decoration: const InputDecoration(labelText: 'Phone number'),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _vehicleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Vehicle / delivery detail',
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _scheduleController,
+                  decoration: const InputDecoration(labelText: 'Date and time'),
+                ),
+                const SizedBox(height: 14),
+                _ChoiceWrap(
+                  items: _purposes,
+                  selected: _selectedPurpose,
+                  onSelected: (value) =>
+                      setState(() => _selectedPurpose = value),
+                ),
+                const SizedBox(height: 16),
+                LuxuryButton(
+                  label: 'Generate QR Code',
+                  icon: Icons.qr_code_2_outlined,
+                  onPressed: () {
+                    final prefix = switch (_selectedQr) {
+                      'QR Parking' => 'PAR',
+                      'QR Delivery' => 'DEL',
+                      'QR Guest' => 'GST',
+                      _ => 'VIS',
+                    };
+                    setState(() => _generatedCode = '$prefix-A1808-2026-001');
+                  },
+                ),
+              ],
             ),
           ),
-        ),
-        const SectionHeader(title: 'Visitor Management'),
-        Wrap(
-          spacing: 8,
-          children: [
-            for (final status in ['Upcoming', 'Used', 'Expired'])
-              ChoiceChip(
-                label: Text(status),
-                selected: _visitorFilter == status,
-                onSelected: (_) => setState(() => _visitorFilter = status),
-              ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        for (final visitor in filteredVisitors)
-          PremiumListTile(
-            icon: Icons.person_pin_circle_outlined,
-            title: visitor.name,
+          const SizedBox(height: 14),
+          _PremiumQrCard(
+            code: _generatedCode,
+            title: '$_selectedQr Pass',
             subtitle:
-                '${visitor.purpose} - ${_date.format(visitor.visitTime)} at ${_time.format(visitor.visitTime)}',
-            trailing: StatusBadge(status: visitor.status),
+                '${_nameController.text} - $_selectedPurpose - ${_scheduleController.text}',
+            onShare: () => ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Share QR simulated for ${_nameController.text}.',
+                ),
+              ),
+            ),
           ),
-      ],
+          const SizedBox(height: 20),
+          _SectionTitle(
+            title: 'Visitor Management',
+            actionLabel: 'History',
+            icon: Icons.manage_accounts_outlined,
+          ),
+          _ChoiceWrap(
+            items: const ['Upcoming', 'Used', 'Expired'],
+            selected: _visitorFilter,
+            onSelected: (value) => setState(() => _visitorFilter = value),
+          ),
+          const SizedBox(height: 12),
+          for (final visitor in filteredVisitors)
+            _VisitorPassCard(visitor: visitor),
+        ],
+      ),
     );
   }
 }
@@ -449,112 +436,76 @@ class _BillingPaymentPageState extends State<BillingPaymentPage> {
         .where((billing) => billing.status != 'Paid')
         .fold<int>(0, (total, billing) => total + billing.amount);
 
-    return ListView(
-      key: const ValueKey('resident-billing'),
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
-      children: [
-        const SectionHeader(title: 'Billing & Payment'),
-        GlassCard(
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Current Outstanding',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      _currency.format(totalActive),
-                      style: Theme.of(context).textTheme.headlineMedium
-                          ?.copyWith(fontWeight: FontWeight.w900),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'IPL, Air, Listrik, Parkir, and Denda are ready for API integration.',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(
-                Icons.account_balance_wallet_outlined,
-                color: AppColors.softGold,
-                size: 38,
-              ),
+    return _ResidentSurface(
+      child: ListView(
+        key: const ValueKey('resident-billing'),
+        padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
+        children: [
+          _BillingSummaryCard(
+            totalActive: totalActive,
+            nextDue: _billings
+                .where((item) => item.status != 'Paid')
+                .map((item) => item.dueDate)
+                .fold<DateTime?>(null, (earliest, date) {
+                  if (earliest == null || date.isBefore(earliest)) {
+                    return date;
+                  }
+                  return earliest;
+                }),
+            onPay: () {
+              final index = _billings.indexWhere(
+                (billing) => billing.status != 'Paid',
+              );
+              if (index != -1) {
+                _openPaymentSheet(context, index);
+              }
+            },
+          ),
+          const SizedBox(height: 14),
+          const _FlowStepStrip(
+            steps: [
+              'Overview',
+              'Invoice',
+              'Method',
+              'Confirm',
+              'Success',
+              'History',
             ],
           ),
-        ),
-        const SectionHeader(title: 'Active Invoices'),
-        for (var i = 0; i < _billings.length; i++)
-          GlassCard(
-            margin: const EdgeInsets.only(bottom: 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        '${_billings[i].category} - ${_billings[i].id}',
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ),
-                    StatusBadge(status: _billings[i].status),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  _currency.format(_billings[i].amount),
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                Text(
-                  'Due ${_date.format(_billings[i].dueDate)}',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                const SizedBox(height: 14),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () =>
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Invoice PDF generated for ${_billings[i].id}.',
-                                ),
-                              ),
-                            ),
-                        icon: const Icon(Icons.picture_as_pdf_outlined),
-                        label: const Text('Invoice PDF'),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    if (_billings[i].status != 'Paid')
-                      Expanded(
-                        child: LuxuryButton(
-                          label: 'Pay Now',
-                          icon: Icons.payments_outlined,
-                          onPressed: () => _openPaymentSheet(context, i),
-                        ),
-                      ),
-                  ],
-                ),
-              ],
-            ),
+          const SizedBox(height: 20),
+          _SectionTitle(
+            title: 'Active Invoices',
+            actionLabel: '${_billings.length} records',
+            icon: Icons.receipt_long_outlined,
           ),
-        const SectionHeader(title: 'Payment History'),
-        PremiumListTile(
-          icon: Icons.check_circle_outline,
-          title: 'Air - INV-WTR-0626',
-          subtitle: 'Paid via Virtual Account on 2 Jun 2026',
-          trailing: const StatusBadge(status: 'Paid'),
-        ),
-      ],
+          for (var i = 0; i < _billings.length; i++)
+            _InvoiceCard(
+              billing: _billings[i],
+              onDownload: () => ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Invoice PDF generated for ${_billings[i].id}.',
+                  ),
+                ),
+              ),
+              onPay: _billings[i].status == 'Paid'
+                  ? null
+                  : () => _openPaymentSheet(context, i),
+            ),
+          const SizedBox(height: 8),
+          _SectionTitle(
+            title: 'Payment History',
+            actionLabel: 'Statement',
+            icon: Icons.history_outlined,
+          ),
+          const _HistoryTile(
+            icon: Icons.check_circle_outline,
+            title: 'Air - INV-WTR-0626',
+            subtitle: 'Paid via Virtual Account on 2 Jun 2026',
+            status: 'Paid',
+          ),
+        ],
+      ),
     );
   }
 
@@ -567,68 +518,67 @@ class _BillingPaymentPageState extends State<BillingPaymentPage> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setSheetState) {
-            return Padding(
-              padding: EdgeInsets.fromLTRB(
-                16,
-                16,
-                16,
-                MediaQuery.of(context).viewInsets.bottom + 16,
-              ),
-              child: GlassCard(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Payment Method',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+            return _ResidentSurface(
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    16,
+                    16,
+                    MediaQuery.of(context).viewInsets.bottom + 16,
+                  ),
+                  child: _WhitePremiumCard(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        for (final item in [
-                          'Midtrans',
-                          'Xendit',
-                          'Virtual Account',
-                          'QRIS',
-                        ])
-                          ChoiceChip(
-                            label: Text(item),
-                            selected: method == item,
-                            onSelected: (_) =>
-                                setSheetState(() => method = item),
-                          ),
+                        const _CardTitle(
+                          title: 'Choose Payment Method',
+                          subtitle:
+                              'Review your invoice and simulate a secure payment confirmation.',
+                          icon: Icons.account_balance_wallet_outlined,
+                        ),
+                        const SizedBox(height: 16),
+                        _ChoiceWrap(
+                          items: const [
+                            'Midtrans',
+                            'Xendit',
+                            'Virtual Account',
+                            'QRIS',
+                          ],
+                          selected: method,
+                          onSelected: (value) =>
+                              setSheetState(() => method = value),
+                        ),
+                        const SizedBox(height: 16),
+                        _PaymentInstructionCard(
+                          method: method,
+                          billing: _billings[index],
+                        ),
+                        const SizedBox(height: 16),
+                        LuxuryButton(
+                          label: 'Simulate Payment Success',
+                          icon: Icons.verified_outlined,
+                          onPressed: () {
+                            setState(
+                              () => _billings[index] = _billings[index]
+                                  .copyWith(status: 'Paid'),
+                            );
+                            Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  '${_billings[index].id} marked as Paid via $method.',
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    PremiumListTile(
-                      icon: Icons.info_outline,
-                      title: '$method Instruction',
-                      subtitle:
-                          'Mock payment gateway. Follow displayed virtual instruction, then simulate success.',
-                    ),
-                    LuxuryButton(
-                      label: 'Simulate Payment Success',
-                      icon: Icons.verified_outlined,
-                      onPressed: () {
-                        setState(
-                          () => _billings[index] = _billings[index].copyWith(
-                            status: 'Paid',
-                          ),
-                        );
-                        Navigator.of(context).pop();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '${_billings[index].id} marked as Paid via $method.',
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                  ),
                 ),
               ),
             );
@@ -672,41 +622,56 @@ class _ResidentServicePageState extends State<ResidentServicePage> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      key: const ValueKey('resident-service'),
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
-      children: [
-        const SectionHeader(title: 'Service, Package & Facility'),
-        Wrap(
-          spacing: 8,
-          children: [
-            for (final mode in ['Tickets', 'Packages', 'Facility'])
-              ChoiceChip(
-                label: Text(mode),
-                selected: _mode == mode,
-                onSelected: (_) => setState(() => _mode = mode),
-              ),
-          ],
-        ),
-        const SizedBox(height: 14),
-        if (_mode == 'Tickets') ..._ticketContent(context),
-        if (_mode == 'Packages') ..._packageContent(),
-        if (_mode == 'Facility') ..._facilityContent(context),
-      ],
+    return _ResidentSurface(
+      child: ListView(
+        key: const ValueKey('resident-service'),
+        padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
+        children: [
+          const _ResidentHeader(
+            title: 'Service, Package & Facility',
+            subtitle: 'Fast, transparent, and efficient resident operations',
+            icon: Icons.home_repair_service_outlined,
+          ),
+          const SizedBox(height: 14),
+          const _FlowStepStrip(
+            steps: [
+              'Create',
+              'Describe',
+              'Submitted',
+              'Assigned',
+              'Progress',
+              'Completed',
+              'Rate',
+            ],
+          ),
+          const SizedBox(height: 16),
+          _SegmentedModeControl(
+            modes: const ['Tickets', 'Packages', 'Facility'],
+            selected: _mode,
+            onSelected: (value) => setState(() => _mode = value),
+          ),
+          const SizedBox(height: 16),
+          if (_mode == 'Tickets') ..._ticketContent(context),
+          if (_mode == 'Packages') ..._packageContent(),
+          if (_mode == 'Facility') ..._facilityContent(context),
+        ],
+      ),
     );
   }
 
   List<Widget> _ticketContent(BuildContext context) {
     return [
-      GlassCard(
+      _WhitePremiumCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Submit Ticket',
-              style: Theme.of(context).textTheme.titleMedium,
+            const _CardTitle(
+              title: 'Submit Ticket',
+              subtitle:
+                  'Describe the issue and let management assign the right staff.',
+              icon: Icons.edit_note_outlined,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               initialValue: _category,
               decoration: const InputDecoration(labelText: 'Category'),
@@ -751,11 +716,8 @@ class _ResidentServicePageState extends State<ResidentServicePage> {
                   setState(() => _priority = value ?? _priority),
             ),
             const SizedBox(height: 12),
-            PremiumListTile(
-              icon: Icons.photo_camera_outlined,
-              title: 'Upload photo dummy',
-              subtitle: 'Photo placeholder attached for presentation.',
-            ),
+            const _UploadPhotoStub(),
+            const SizedBox(height: 14),
             LuxuryButton(
               label: 'Submit Ticket',
               icon: Icons.add_task_outlined,
@@ -780,89 +742,76 @@ class _ResidentServicePageState extends State<ResidentServicePage> {
           ],
         ),
       ),
-      const SectionHeader(title: 'Ticket Pipeline'),
-      Text(
-        'Open > Assigned > Progress > Done',
-        style: Theme.of(context).textTheme.bodySmall,
+      const SizedBox(height: 20),
+      const _SectionTitle(
+        title: 'Ticket Pipeline',
+        actionLabel: 'Live status',
+        icon: Icons.route_outlined,
       ),
-      const SizedBox(height: 10),
-      for (final ticket in _tickets)
-        PremiumListTile(
-          icon: Icons.build_circle_outlined,
-          title: '${ticket.id} - ${ticket.title}',
-          subtitle:
-              '${ticket.category} - ${ticket.priority} - ${ticket.assignee}',
-          trailing: StatusBadge(status: ticket.status),
-        ),
+      const _ServiceStatusTimeline(),
+      const SizedBox(height: 12),
+      for (final ticket in _tickets) _TicketPipelineCard(ticket: ticket),
     ];
   }
 
   List<Widget> _packageContent() {
     return [
-      QRPreviewCard(code: 'PKG-A1808-PICKUP', title: 'Pickup QR / Code'),
-      const SectionHeader(title: 'Package List'),
-      for (final item in DemoData.packages)
-        PremiumListTile(
-          icon: Icons.inventory_2_outlined,
-          title: '${item.sender} via ${item.courier}',
-          subtitle:
-              'Arrived ${_date.format(item.arrivalTime)} at ${_time.format(item.arrivalTime)} - Proof photo placeholder',
-          trailing: StatusBadge(status: item.status),
-        ),
+      _PremiumQrCard(
+        code: 'PKG-A1808-PICKUP',
+        title: 'Pickup QR / Code',
+        subtitle: 'Show this code at concierge to collect waiting packages.',
+      ),
+      const SizedBox(height: 20),
+      _SectionTitle(
+        title: 'Package List',
+        actionLabel: '${DemoData.packages.length} items',
+        icon: Icons.inventory_2_outlined,
+      ),
+      for (final item in DemoData.packages) _PackageCard(item: item),
     ];
   }
 
   List<Widget> _facilityContent(BuildContext context) {
     return [
-      GlassCard(
+      _WhitePremiumCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Booking Facility',
-              style: Theme.of(context).textTheme.titleMedium,
+            const _CardTitle(
+              title: 'Booking Facility',
+              subtitle:
+                  'Choose facility, review availability, and submit a digital reservation.',
+              icon: Icons.event_available_outlined,
             ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final item in [
-                  'Kolam Renang',
-                  'Gym',
-                  'Function Hall',
-                  'Tennis Court',
-                  'Meeting Room',
-                ])
-                  ChoiceChip(
-                    label: Text(item),
-                    selected: _facility == item,
-                    onSelected: (_) => setState(() => _facility = item),
-                  ),
+            const SizedBox(height: 16),
+            _ChoiceWrap(
+              items: const [
+                'Kolam Renang',
+                'Gym',
+                'Function Hall',
+                'Tennis Court',
+                'Meeting Room',
               ],
+              selected: _facility,
+              onSelected: (value) => setState(() => _facility = value),
             ),
-            const SizedBox(height: 14),
-            PremiumListTile(
+            const SizedBox(height: 16),
+            const _InfoTile(
               icon: Icons.calendar_month_outlined,
               title: 'Selected date',
               subtitle: '7 Jun 2026',
+              status: 'Available',
             ),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final slot in [
-                  '07:00 - 08:00',
-                  '10:00 - 11:00',
-                  '16:00 - 17:00',
-                  '19:00 - 22:00',
-                ])
-                  ChoiceChip(
-                    label: Text(slot),
-                    selected: _slot == slot,
-                    onSelected: (_) => setState(() => _slot = slot),
-                  ),
+            const SizedBox(height: 12),
+            _ChoiceWrap(
+              items: const [
+                '07:00 - 08:00',
+                '10:00 - 11:00',
+                '16:00 - 17:00',
+                '19:00 - 22:00',
               ],
+              selected: _slot,
+              onSelected: (value) => setState(() => _slot = value),
             ),
             const SizedBox(height: 16),
             LuxuryButton(
@@ -887,14 +836,13 @@ class _ResidentServicePageState extends State<ResidentServicePage> {
           ],
         ),
       ),
-      const SectionHeader(title: 'Booking History'),
-      for (final booking in _bookings)
-        PremiumListTile(
-          icon: Icons.sports_tennis_outlined,
-          title: booking.facility,
-          subtitle: '${_date.format(booking.date)} - ${booking.slot}',
-          trailing: StatusBadge(status: booking.status),
-        ),
+      const SizedBox(height: 20),
+      _SectionTitle(
+        title: 'Booking History',
+        actionLabel: '${_bookings.length} reservations',
+        icon: Icons.history_toggle_off_outlined,
+      ),
+      for (final booking in _bookings) _FacilityBookingCard(booking: booking),
     ];
   }
 }
@@ -908,55 +856,209 @@ class CommunityPage extends StatelessWidget {
 
     return DefaultTabController(
       length: categories.length,
-      child: Column(
-        key: const ValueKey('resident-community'),
+      child: _ResidentSurface(
+        child: Column(
+          key: const ValueKey('resident-community'),
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _ResidentHeader(
+                    title: 'Community Hub',
+                    subtitle: 'Stay connected, informed, and engaged',
+                    icon: Icons.forum_outlined,
+                  ),
+                  const SizedBox(height: 14),
+                  const _CommunityFeatureRow(),
+                  const SizedBox(height: 14),
+                  _WhitePremiumCard(
+                    padding: const EdgeInsets.all(6),
+                    child: TabBar(
+                      isScrollable: true,
+                      dividerColor: Colors.transparent,
+                      indicator: BoxDecoration(
+                        color: _residentSoftGold,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: _residentGold.withValues(alpha: 0.32),
+                        ),
+                      ),
+                      labelColor: _residentNavy,
+                      unselectedLabelColor: _residentMuted,
+                      labelStyle: Theme.of(context).textTheme.labelLarge
+                          ?.copyWith(fontWeight: FontWeight.w900),
+                      tabAlignment: TabAlignment.start,
+                      tabs: [
+                        for (final category in categories)
+                          Tab(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              child: Text(category),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  for (final category in categories)
+                    ListView(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
+                      children: [
+                        for (final post in DemoData.communityPosts.where(
+                          (item) => item.category == category,
+                        ))
+                          _CommunityPostCard(post: post),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ResidentSurface extends StatelessWidget {
+  const _ResidentSurface({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final base = Theme.of(context);
+    return Theme(
+      data: base.copyWith(
+        textTheme: base.textTheme.apply(
+          bodyColor: _residentNavy,
+          displayColor: _residentNavy,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          labelStyle: const TextStyle(color: _residentMuted),
+          floatingLabelStyle: const TextStyle(
+            color: _residentGold,
+            fontWeight: FontWeight.w800,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: _residentLine),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: _residentGold, width: 1.2),
+          ),
+        ),
+        dropdownMenuTheme: const DropdownMenuThemeData(
+          textStyle: TextStyle(color: _residentNavy),
+        ),
+      ),
+      child: ColoredBox(color: _residentBackground, child: child),
+    );
+  }
+}
+
+class _WhitePremiumCard extends StatelessWidget {
+  const _WhitePremiumCard({
+    required this.child,
+    this.padding = const EdgeInsets.all(18),
+    this.margin = EdgeInsets.zero,
+    this.onTap,
+  });
+
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry margin;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final content = Container(
+      width: double.infinity,
+      margin: margin,
+      padding: padding,
+      decoration: BoxDecoration(
+        color: _residentCard,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: _residentLine),
+        boxShadow: [
+          BoxShadow(
+            color: _residentNavy.withValues(alpha: 0.07),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: child,
+    );
+    if (onTap == null) {
+      return content;
+    }
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: onTap,
+        child: content,
+      ),
+    );
+  }
+}
+
+class _ResidentHeader extends StatelessWidget {
+  const _ResidentHeader({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return _WhitePremiumCard(
+      padding: const EdgeInsets.all(20),
+      child: Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 12),
+          _GoldIcon(icon: icon, size: 48),
+          const SizedBox(width: 16),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SectionHeader(title: 'Community'),
-                GlassCard(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 6,
-                  ),
-                  child: TabBar(
-                    isScrollable: true,
-                    indicatorColor: AppColors.softGold,
-                    labelColor: AppColors.softGold,
-                    unselectedLabelColor: AppColors.textSecondary,
-                    tabs: [
-                      for (final category in categories) Tab(text: category),
-                    ],
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: _residentNavy,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0,
                   ),
                 ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: TabBarView(
-              children: [
-                for (final category in categories)
-                  ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
-                    children: [
-                      for (final post in DemoData.communityPosts.where(
-                        (item) => item.category == category,
-                      ))
-                        PremiumListTile(
-                          icon: switch (category) {
-                            'Marketplace' => Icons.sell_outlined,
-                            'Lost & Found' => Icons.manage_search_outlined,
-                            'Events' => Icons.celebration_outlined,
-                            _ => Icons.chat_bubble_outline,
-                          },
-                          title: post.title,
-                          subtitle: '${post.author} - ${post.description}',
-                        ),
-                    ],
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: _residentMuted,
+                    height: 1.35,
                   ),
+                ),
               ],
             ),
           ),
@@ -966,39 +1068,1569 @@ class CommunityPage extends StatelessWidget {
   }
 }
 
-class _TinyInfo extends StatelessWidget {
-  const _TinyInfo({required this.label, required this.value});
+class _ResidentHeroCard extends StatelessWidget {
+  const _ResidentHeroCard({required this.resident, required this.activeBill});
+
+  final Resident resident;
+  final int activeBill;
+
+  @override
+  Widget build(BuildContext context) {
+    return _WhitePremiumCard(
+      padding: EdgeInsets.zero,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: const BoxDecoration(
+              color: _residentNavy,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 54,
+                  height: 54,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: _residentGold.withValues(alpha: 0.46),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.person_outline,
+                    color: _residentGold,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Good Morning, ${resident.name.split(' ').first}',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${resident.unit.label} / ${resident.residencyStatus} Resident',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.76),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    IconButton(
+                      tooltip: 'Notifications',
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.notifications_none_outlined,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Positioned(
+                      top: 9,
+                      right: 10,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: AppColors.danger,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isNarrow = constraints.maxWidth < 360;
+                final cards = [
+                  _HeroMiniCard(
+                    label: 'Due Payments',
+                    value: _currency.format(activeBill),
+                    caption: 'Due ${_date.format(DateTime(2026, 6, 12))}',
+                    icon: Icons.receipt_long_outlined,
+                    dark: true,
+                  ),
+                  const _HeroMiniCard(
+                    label: 'My Points',
+                    value: '12.450',
+                    caption: 'Active access status',
+                    icon: Icons.card_giftcard_outlined,
+                  ),
+                ];
+                if (isNarrow) {
+                  return Column(
+                    children: [
+                      cards.first,
+                      const SizedBox(height: 12),
+                      cards.last,
+                    ],
+                  );
+                }
+                return Row(
+                  children: [
+                    Expanded(child: cards.first),
+                    const SizedBox(width: 12),
+                    Expanded(child: cards.last),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeroMiniCard extends StatelessWidget {
+  const _HeroMiniCard({
+    required this.label,
+    required this.value,
+    required this.caption,
+    required this.icon,
+    this.dark = false,
+  });
+
+  final String label;
+  final String value;
+  final String caption;
+  final IconData icon;
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: dark ? _residentNavy : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: dark ? Colors.transparent : _residentLine),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  label.toUpperCase(),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: dark
+                        ? Colors.white.withValues(alpha: 0.78)
+                        : _residentMuted,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              Icon(icon, color: _residentGold, size: 22),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: dark ? _residentGold : _residentNavy,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            caption,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: dark
+                  ? Colors.white.withValues(alpha: 0.72)
+                  : _residentMuted,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({
+    required this.title,
+    required this.icon,
+    this.actionLabel,
+  });
+
+  final String title;
+  final IconData icon;
+  final String? actionLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Icon(icon, color: _residentGold, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: _residentNavy,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          if (actionLabel != null)
+            Text(
+              actionLabel!,
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                color: _residentGold,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ResponsiveGrid extends StatelessWidget {
+  const _ResponsiveGrid({
+    required this.children,
+    this.minTileWidth = 140,
+    this.spacing = 12,
+    this.childAspectRatio,
+  });
+
+  final List<Widget> children;
+  final double minTileWidth;
+  final double spacing;
+  final double? childAspectRatio;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final rawCount =
+            ((constraints.maxWidth + spacing) / (minTileWidth + spacing))
+                .floor();
+        final count = rawCount.clamp(2, 4);
+        return GridView.count(
+          crossAxisCount: count,
+          mainAxisSpacing: spacing,
+          crossAxisSpacing: spacing,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          childAspectRatio: childAspectRatio ?? (count > 2 ? 1.05 : 1.18),
+          children: children,
+        );
+      },
+    );
+  }
+}
+
+class _ResidentActionCard extends StatelessWidget {
+  const _ResidentActionCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return _WhitePremiumCard(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 18),
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _GoldIcon(icon: icon, size: 48),
+          const SizedBox(height: 14),
+          Text(
+            title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: _residentNavy,
+              fontWeight: FontWeight.w900,
+              height: 1.16,
+            ),
+          ),
+          const SizedBox(height: 7),
+          Text(
+            subtitle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: _residentMuted,
+              height: 1.25,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MiniFeatureTile extends StatelessWidget {
+  const _MiniFeatureTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return _WhitePremiumCard(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 18),
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _GoldIcon(icon: icon, size: 48),
+          const SizedBox(height: 14),
+          Text(
+            title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: _residentNavy,
+              fontWeight: FontWeight.w900,
+              height: 1.16,
+            ),
+          ),
+          const SizedBox(height: 7),
+          Text(
+            subtitle,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: _residentMuted, height: 1.3),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MetricMiniCard extends StatelessWidget {
+  const _MetricMiniCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.caption,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+  final String caption;
+
+  @override
+  Widget build(BuildContext context) {
+    return _WhitePremiumCard(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _GoldIcon(icon: icon, size: 46),
+          const SizedBox(height: 14),
+          Text(
+            value,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: _residentNavy,
+              fontWeight: FontWeight.w900,
+              height: 1.16,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: _residentMuted,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            caption,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: _residentMuted,
+              height: 1.25,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AnnouncementPreview extends StatelessWidget {
+  const _AnnouncementPreview({
+    required this.title,
+    required this.message,
+    required this.category,
+    required this.onTap,
+  });
+
+  final String title;
+  final String message;
+  final String category;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: onTap,
+      child: Row(
+        children: [
+          const _GoldIcon(icon: Icons.campaign_outlined, size: 46),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                StatusBadge(status: category),
+                const SizedBox(height: 8),
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: _residentNavy,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  message,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: _residentMuted,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.chevron_right, color: _residentGold),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmergencyPanel extends StatelessWidget {
+  const _EmergencyPanel({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return _WhitePremiumCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.danger.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppColors.danger.withValues(alpha: 0.20),
+                  ),
+                ),
+                child: const Icon(Icons.sos_outlined, color: AppColors.danger),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Emergency Assistance',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: _residentNavy,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'SOS, security, and medical assistance remain one tap away.',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: _residentMuted),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          EmergencyButton(onPressed: onPressed),
+        ],
+      ),
+    );
+  }
+}
+
+class _FlowStepStrip extends StatelessWidget {
+  const _FlowStepStrip({required this.steps});
+
+  final List<String> steps;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 86,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: steps.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        itemBuilder: (context, index) {
+          return _FlowStepCard(number: index + 1, label: steps[index]);
+        },
+      ),
+    );
+  }
+}
+
+class _FlowStepCard extends StatelessWidget {
+  const _FlowStepCard({required this.number, required this.label});
+
+  final int number;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 112,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _residentGold.withValues(alpha: 0.22)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 26,
+            height: 26,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: _residentGold,
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              '$number',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const Spacer(),
+          Text(
+            label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: _residentNavy,
+              fontWeight: FontWeight.w900,
+              height: 1.12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CardTitle extends StatelessWidget {
+  const _CardTitle({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _GoldIcon(icon: icon, size: 42),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: _residentNavy,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: _residentMuted,
+                  height: 1.35,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ChoiceWrap extends StatelessWidget {
+  const _ChoiceWrap({
+    required this.items,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final List<String> items;
+  final String selected;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final item in items)
+          _PillChoice(
+            label: item,
+            selected: selected == item,
+            onTap: () => onSelected(item),
+          ),
+      ],
+    );
+  }
+}
+
+class _PillChoice extends StatelessWidget {
+  const _PillChoice({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected ? _residentSoftGold : Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(999),
+        side: BorderSide(
+          color: selected
+              ? _residentGold.withValues(alpha: 0.55)
+              : _residentLine,
+        ),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: selected ? _residentNavy : _residentMuted,
+              fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PremiumQrCard extends StatelessWidget {
+  const _PremiumQrCard({
+    required this.code,
+    required this.title,
+    required this.subtitle,
+    this.onShare,
+  });
+
+  final String code;
+  final String title;
+  final String subtitle;
+  final VoidCallback? onShare;
+
+  @override
+  Widget build(BuildContext context) {
+    return _WhitePremiumCard(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: _residentNavy,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: _residentMuted,
+              height: 1.35,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: _residentLine),
+              boxShadow: [
+                BoxShadow(
+                  color: _residentNavy.withValues(alpha: 0.06),
+                  blurRadius: 18,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: QrImageView(
+              data: code,
+              version: QrVersions.auto,
+              size: 180,
+              backgroundColor: Colors.white,
+              eyeStyle: const QrEyeStyle(color: Colors.black),
+              dataModuleStyle: const QrDataModuleStyle(color: Colors.black),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: _residentSoftGold,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: _residentGold.withValues(alpha: 0.22)),
+            ),
+            child: Text(
+              code,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: _residentNavy,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          if (onShare != null) ...[
+            const SizedBox(height: 14),
+            LuxuryButton(
+              label: 'Share QR',
+              icon: Icons.ios_share_outlined,
+              onPressed: onShare!,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _VisitorPassCard extends StatelessWidget {
+  const _VisitorPassCard({required this.visitor});
+
+  final VisitorPass visitor;
+
+  @override
+  Widget build(BuildContext context) {
+    return _InfoTile(
+      icon: Icons.person_pin_circle_outlined,
+      title: visitor.name,
+      subtitle:
+          '${visitor.purpose} - ${_date.format(visitor.visitTime)} at ${_time.format(visitor.visitTime)}',
+      status: visitor.status,
+    );
+  }
+}
+
+class _BillingSummaryCard extends StatelessWidget {
+  const _BillingSummaryCard({
+    required this.totalActive,
+    required this.nextDue,
+    required this.onPay,
+  });
+
+  final int totalActive;
+  final DateTime? nextDue;
+  final VoidCallback onPay;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: _residentNavy,
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: _residentNavy.withValues(alpha: 0.18),
+            blurRadius: 26,
+            offset: const Offset(0, 14),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const _GoldIcon(
+                icon: Icons.account_balance_wallet_outlined,
+                size: 48,
+                filled: false,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Current Outstanding',
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.74),
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Billing & Payment',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Text(
+            _currency.format(totalActive),
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              color: _residentGold,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            nextDue == null
+                ? 'All invoices are paid'
+                : 'Due ${_date.format(nextDue!)} - IPL, electricity, parking',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.white.withValues(alpha: 0.76),
+            ),
+          ),
+          const SizedBox(height: 18),
+          LuxuryButton(
+            label: totalActive == 0 ? 'View Statement' : 'Pay Now',
+            icon: Icons.payments_outlined,
+            onPressed: onPay,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InvoiceCard extends StatelessWidget {
+  const _InvoiceCard({
+    required this.billing,
+    required this.onDownload,
+    required this.onPay,
+  });
+
+  final Billing billing;
+  final VoidCallback onDownload;
+  final VoidCallback? onPay;
+
+  @override
+  Widget build(BuildContext context) {
+    return _WhitePremiumCard(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _GoldIcon(icon: _billingIcon(billing.category), size: 42),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      billing.category,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: _residentNavy,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      billing.id,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: _residentMuted),
+                    ),
+                  ],
+                ),
+              ),
+              StatusBadge(status: billing.status),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  _currency.format(billing.amount),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: _residentNavy,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              Text(
+                'Due ${_date.format(billing.dueDate)}',
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: _residentMuted,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: onDownload,
+                  icon: const Icon(Icons.picture_as_pdf_outlined),
+                  label: const Text('Invoice PDF'),
+                ),
+              ),
+              if (onPay != null) ...[
+                const SizedBox(width: 10),
+                Expanded(
+                  child: LuxuryButton(
+                    label: 'Pay Now',
+                    icon: Icons.payments_outlined,
+                    onPressed: onPay!,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  IconData _billingIcon(String category) {
+    return switch (category) {
+      'Air' => Icons.water_drop_outlined,
+      'Listrik' => Icons.bolt_outlined,
+      'Parkir' => Icons.local_parking_outlined,
+      _ => Icons.receipt_long_outlined,
+    };
+  }
+}
+
+class _PaymentInstructionCard extends StatelessWidget {
+  const _PaymentInstructionCard({required this.method, required this.billing});
+
+  final String method;
+  final Billing billing;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: _residentSoftGray,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _residentLine),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _InlineInfo(label: 'Invoice', value: billing.id),
+          const SizedBox(height: 8),
+          _InlineInfo(label: 'Amount', value: _currency.format(billing.amount)),
+          const SizedBox(height: 8),
+          _InlineInfo(label: 'Method', value: method),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              const Icon(Icons.lock_outline, color: _residentGold, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Mock payment gateway. Continue to simulate secure payment success.',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: _residentMuted,
+                    height: 1.35,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HistoryTile extends StatelessWidget {
+  const _HistoryTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.status,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    return _InfoTile(
+      icon: icon,
+      title: title,
+      subtitle: subtitle,
+      status: status,
+    );
+  }
+}
+
+class _SegmentedModeControl extends StatelessWidget {
+  const _SegmentedModeControl({
+    required this.modes,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final List<String> modes;
+  final String selected;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return _WhitePremiumCard(
+      padding: const EdgeInsets.all(6),
+      child: Row(
+        children: [
+          for (final mode in modes)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(2),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(18),
+                  onTap: () => onSelected(mode),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: selected == mode ? _residentNavy : Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      mode,
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: selected == mode ? Colors.white : _residentMuted,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _UploadPhotoStub extends StatelessWidget {
+  const _UploadPhotoStub();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: _residentSoftGray,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _residentLine),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.photo_camera_outlined, color: _residentGold),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Upload photo dummy',
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: _residentNavy,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  'Photo placeholder attached for presentation.',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: _residentMuted),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            width: 36,
+            height: 36,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: _residentLine),
+            ),
+            child: const Icon(Icons.add, color: _residentGold),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ServiceStatusTimeline extends StatelessWidget {
+  const _ServiceStatusTimeline();
+
+  @override
+  Widget build(BuildContext context) {
+    final steps = [
+      ('Open', Icons.add_circle_outline),
+      ('Assigned', Icons.engineering_outlined),
+      ('Progress', Icons.sync_outlined),
+      ('Done', Icons.check_circle_outline),
+    ];
+    return _WhitePremiumCard(
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        children: [
+          for (var i = 0; i < steps.length; i++) ...[
+            Expanded(
+              child: Column(
+                children: [
+                  _GoldIcon(icon: steps[i].$2, size: 38),
+                  const SizedBox(height: 8),
+                  Text(
+                    steps[i].$1,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: _residentNavy,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (i != steps.length - 1)
+              Container(
+                width: 18,
+                height: 1,
+                color: _residentGold.withValues(alpha: 0.45),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _TicketPipelineCard extends StatelessWidget {
+  const _TicketPipelineCard({required this.ticket});
+
+  final ServiceTicket ticket;
+
+  @override
+  Widget build(BuildContext context) {
+    return _InfoTile(
+      icon: Icons.build_circle_outlined,
+      title: '${ticket.id} - ${ticket.title}',
+      subtitle: '${ticket.category} - ${ticket.priority} - ${ticket.assignee}',
+      status: ticket.status,
+    );
+  }
+}
+
+class _PackageCard extends StatelessWidget {
+  const _PackageCard({required this.item});
+
+  final PackageDelivery item;
+
+  @override
+  Widget build(BuildContext context) {
+    return _InfoTile(
+      icon: Icons.inventory_2_outlined,
+      title: '${item.sender} via ${item.courier}',
+      subtitle:
+          'Arrived ${_date.format(item.arrivalTime)} at ${_time.format(item.arrivalTime)} - Pickup ${item.pickupCode}',
+      status: item.status,
+    );
+  }
+}
+
+class _FacilityBookingCard extends StatelessWidget {
+  const _FacilityBookingCard({required this.booking});
+
+  final FacilityBooking booking;
+
+  @override
+  Widget build(BuildContext context) {
+    return _InfoTile(
+      icon: Icons.sports_tennis_outlined,
+      title: booking.facility,
+      subtitle: '${_date.format(booking.date)} - ${booking.slot}',
+      status: booking.status,
+    );
+  }
+}
+
+class _CommunityFeatureRow extends StatelessWidget {
+  const _CommunityFeatureRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      (Icons.campaign_outlined, 'Announcements'),
+      (Icons.event_outlined, 'Events'),
+      (Icons.chat_bubble_outline, 'Forum'),
+      (Icons.folder_copy_outlined, 'Archive'),
+    ];
+    return SizedBox(
+      height: 90,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: items.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        itemBuilder: (context, index) {
+          return SizedBox(
+            width: 126,
+            child: _WhitePremiumCard(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _GoldIcon(icon: items[index].$1, size: 34),
+                  const Spacer(),
+                  Text(
+                    items[index].$2,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: _residentNavy,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _CommunityPostCard extends StatelessWidget {
+  const _CommunityPostCard({required this.post});
+
+  final CommunityPost post;
+
+  @override
+  Widget build(BuildContext context) {
+    final icon = switch (post.category) {
+      'Marketplace' => Icons.sell_outlined,
+      'Lost & Found' => Icons.manage_search_outlined,
+      'Events' => Icons.celebration_outlined,
+      _ => Icons.chat_bubble_outline,
+    };
+    return _WhitePremiumCard(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _GoldIcon(icon: icon, size: 42),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      post.author,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: _residentNavy,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      post.category,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: _residentMuted),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.more_horiz, color: _residentMuted),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Text(
+            post.title,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: _residentNavy,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            post.description,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: _residentMuted,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Icon(
+                Icons.chat_bubble_outline,
+                size: 17,
+                color: _residentMuted.withValues(alpha: 0.85),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                '12',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: _residentMuted,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Icon(
+                Icons.favorite_border,
+                size: 17,
+                color: _residentMuted.withValues(alpha: 0.85),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                '24',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: _residentMuted,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoTile extends StatelessWidget {
+  const _InfoTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    this.status,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String? status;
+
+  @override
+  Widget build(BuildContext context) {
+    return _WhitePremiumCard(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        children: [
+          _GoldIcon(icon: icon, size: 42),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: _residentNavy,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: _residentMuted,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (status != null) ...[
+            const SizedBox(width: 10),
+            StatusBadge(status: status!),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _InlineInfo extends StatelessWidget {
+  const _InlineInfo({required this.label, required this.value});
 
   final String label;
   final String value;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.glassBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
             label,
-            style: Theme.of(
-              context,
-            ).textTheme.labelSmall?.copyWith(color: AppColors.textSecondary),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: _residentMuted,
+              fontWeight: FontWeight.w700,
+            ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: Theme.of(
-              context,
-            ).textTheme.labelLarge?.copyWith(color: AppColors.textPrimary),
+        ),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: _residentNavy,
+            fontWeight: FontWeight.w900,
           ),
-        ],
+        ),
+      ],
+    );
+  }
+}
+
+class _GoldIcon extends StatelessWidget {
+  const _GoldIcon({required this.icon, this.size = 40, this.filled = true});
+
+  final IconData icon;
+  final double size;
+  final bool filled;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: filled
+            ? _residentSoftGold
+            : Colors.white.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(size * 0.34),
+        border: Border.all(color: _residentGold.withValues(alpha: 0.32)),
       ),
+      child: Icon(icon, color: _residentGold, size: size * 0.54),
     );
   }
 }
