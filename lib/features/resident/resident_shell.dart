@@ -37,6 +37,7 @@ class _ResidentShellState extends State<ResidentShell> {
       currentIndex: _index,
       onIndexChanged: (value) => setState(() => _index = value),
       roleLabel: 'Resident App',
+      compactHeader: _index == 0,
       items: const [
         RoleNavItem(
           label: 'Home',

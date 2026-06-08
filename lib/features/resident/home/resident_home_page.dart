@@ -18,7 +18,7 @@ final _date = DateFormat('d MMM yyyy', 'id_ID');
 
 const _homeBackground = Color(0xFFFAF8F2);
 const _homeNavy = Color(0xFF071B34);
-const _homeBlue = Color(0xFF153763);
+const _homeBlue = Color(0xFF173A67);
 const _homeGold = Color(0xFFC08A1A);
 const _homeSoftGold = Color(0xFFFFF6DF);
 const _homeMuted = Color(0xFF687184);
@@ -94,27 +94,24 @@ class ResidentDashboardPage extends StatelessWidget {
         color: _homeBackground,
         child: ListView(
           key: const ValueKey('resident-dashboard'),
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 128),
           children: [
-            _HeroHeader(
+            _HeroBillStack(
               resident: resident,
-              onEmergency: showEmergency,
-            ).animate().fadeIn(duration: 420.ms).moveY(begin: 16, end: 0),
-            const SizedBox(height: 18),
-            _OutstandingBillCard(
               totalOutstanding: totalOutstanding,
               nearestDue: nearestDue,
+              onEmergency: showEmergency,
               onPayNow: () => onNavigate(2),
-            ),
-            const SizedBox(height: 22),
+            ).animate().fadeIn(duration: 420.ms).moveY(begin: 16, end: 0),
+            const SizedBox(height: 10),
             const _SectionTitle(
               title: 'Quick Access',
               actionLabel: '8 shortcuts',
             ),
             const SizedBox(height: 12),
             _AdaptiveGrid(
-              minTileWidth: 128,
-              childAspectRatio: 1.02,
+              minTileWidth: 92,
+              childAspectRatio: 0.94,
               children: [
                 _QuickAccessCard(
                   icon: Icons.person_search_outlined,
@@ -158,19 +155,19 @@ class ResidentDashboardPage extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 18),
             _SummaryStrip(
               residentStatus: resident.residencyStatus,
               accessStatus: resident.accessStatus,
               waitingPackages: waitingPackages,
               activeBillLabel: _currency.format(totalOutstanding),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 20),
             const _SectionTitle(title: "What's New", actionLabel: 'View All'),
             const SizedBox(height: 12),
             _AdaptiveGrid(
               minTileWidth: 156,
-              childAspectRatio: 0.82,
+              childAspectRatio: 0.86,
               children: [
                 _ActivityCard(
                   icon: Icons.event_available_outlined,
@@ -248,6 +245,48 @@ class ResidentDashboardPage extends StatelessWidget {
   }
 }
 
+class _HeroBillStack extends StatelessWidget {
+  const _HeroBillStack({
+    required this.resident,
+    required this.totalOutstanding,
+    required this.nearestDue,
+    required this.onEmergency,
+    required this.onPayNow,
+  });
+
+  final Resident resident;
+  final int totalOutstanding;
+  final Billing? nearestDue;
+  final VoidCallback onEmergency;
+  final VoidCallback onPayNow;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 318,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          _HeroHeader(resident: resident, onEmergency: onEmergency),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Transform.translate(
+              offset: const Offset(0, 14),
+              child: _OutstandingBillCard(
+                totalOutstanding: totalOutstanding,
+                nearestDue: nearestDue,
+                onPayNow: onPayNow,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _HeroHeader extends StatelessWidget {
   const _HeroHeader({required this.resident, required this.onEmergency});
 
@@ -257,67 +296,107 @@ class _HeroHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 22),
+      height: 228,
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 54),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [_homeNavy, _homeBlue],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: _homeGold.withValues(alpha: 0.20)),
+        borderRadius: BorderRadius.circular(34),
+        border: Border.all(color: _homeGold.withValues(alpha: 0.18)),
         boxShadow: [
           BoxShadow(
-            color: _homeNavy.withValues(alpha: 0.22),
+            color: _homeNavy.withValues(alpha: 0.20),
             blurRadius: 28,
             offset: const Offset(0, 16),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Good Morning,',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.92),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${resident.name.split(' ').first} 👋',
-                      style: Theme.of(context).textTheme.headlineMedium
-                          ?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            height: 1.0,
-                          ),
-                    ),
+          Positioned(
+            top: -24,
+            right: -18,
+            child: Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    Colors.white.withValues(alpha: 0.16),
+                    Colors.white.withValues(alpha: 0.02),
                   ],
                 ),
               ),
-              const SizedBox(width: 12),
-              _NotificationButton(),
-              const SizedBox(width: 10),
-              _HeroEmergencyButton(onTap: onEmergency),
-            ],
+            ),
           ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
+          Positioned(
+            bottom: -26,
+            left: 110,
+            child: Container(
+              width: 180,
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(120),
+                gradient: LinearGradient(
+                  colors: [
+                    _homeGold.withValues(alpha: 0.08),
+                    Colors.white.withValues(alpha: 0.01),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _HeroBadge(text: 'Unit ${resident.unit.number}'),
-              _HeroBadge(text: resident.unit.tower),
-              _HeroBadge(text: '${resident.accessStatus} Access'),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Good Morning,',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: Colors.white.withValues(alpha: 0.92),
+                                fontWeight: FontWeight.w500,
+                              ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          '${resident.name.split(' ').first} 👋',
+                          style: Theme.of(context).textTheme.headlineMedium
+                              ?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                                height: 1.0,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  _NotificationButton(),
+                  const SizedBox(width: 10),
+                  _HeroEmergencyButton(onTap: onEmergency),
+                ],
+              ),
+              const SizedBox(height: 18),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  _HeroBadge(text: 'Unit ${resident.unit.number}'),
+                  _HeroBadge(text: resident.unit.tower),
+                  _HeroBadge(text: '${resident.accessStatus} Access'),
+                ],
+              ),
             ],
           ),
         ],
@@ -345,13 +424,13 @@ class _OutstandingBillCard extends StatelessWidget {
     final badgeLabel = totalOutstanding > 0 ? 'Due Soon' : 'Paid';
 
     return WhitePremiumCard(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            width: 60,
-            height: 60,
+            width: 58,
+            height: 58,
             decoration: BoxDecoration(
               color: _homeSoftGold,
               borderRadius: BorderRadius.circular(18),
@@ -360,7 +439,7 @@ class _OutstandingBillCard extends StatelessWidget {
             child: const Icon(
               Icons.receipt_long_outlined,
               color: _homeGold,
-              size: 30,
+              size: 29,
             ),
           ),
           const SizedBox(width: 14),
@@ -387,6 +466,8 @@ class _OutstandingBillCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   _currency.format(totalOutstanding),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     color: _homeNavy,
                     fontWeight: FontWeight.w900,
@@ -404,13 +485,13 @@ class _OutstandingBillCard extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           SizedBox(
-            height: 44,
+            height: 46,
             child: ElevatedButton(
               onPressed: onPayNow,
               style: ElevatedButton.styleFrom(
                 backgroundColor: _homeGold,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 18),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -508,22 +589,29 @@ class _QuickAccessCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WhitePremiumCard(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
       onTap: onTap,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _GoldIcon(icon: icon, size: 50),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: _homeNavy,
-              fontWeight: FontWeight.w800,
-              height: 1.2,
+          Expanded(
+            child: Center(child: _GoldIcon(icon: icon, size: 40)),
+          ),
+          const SizedBox(height: 4),
+          SizedBox(
+            height: 28,
+            child: Center(
+              child: Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: _homeNavy,
+                  fontWeight: FontWeight.w800,
+                  height: 1.16,
+                ),
+              ),
             ),
           ),
         ],
@@ -548,27 +636,15 @@ class _SummaryStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WhitePremiumCard(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Row(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 12,
         children: [
-          Expanded(
-            child: _SummaryItem(label: 'Resident', value: residentStatus),
-          ),
-          _DividerLine(),
-          Expanded(
-            child: _SummaryItem(label: 'Access', value: accessStatus),
-          ),
-          _DividerLine(),
-          Expanded(
-            child: _SummaryItem(
-              label: 'Packages',
-              value: '$waitingPackages Waiting',
-            ),
-          ),
-          _DividerLine(),
-          Expanded(
-            child: _SummaryItem(label: 'Active Bill', value: activeBillLabel),
-          ),
+          _SummaryItem(label: 'Resident', value: residentStatus),
+          _SummaryItem(label: 'Access', value: accessStatus),
+          _SummaryItem(label: 'Packages', value: '$waitingPackages Waiting'),
+          _SummaryItem(label: 'Active Bill', value: activeBillLabel),
         ],
       ),
     );
@@ -583,8 +659,14 @@ class _SummaryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+    return Container(
+      constraints: const BoxConstraints(minWidth: 120),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFCF7),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _homeLine),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -610,18 +692,6 @@ class _SummaryItem extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _DividerLine extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 38,
-      color: _homeLine,
-      margin: const EdgeInsets.symmetric(horizontal: 6),
     );
   }
 }

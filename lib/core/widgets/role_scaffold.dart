@@ -26,6 +26,7 @@ class RoleScaffold extends StatelessWidget {
     required this.items,
     required this.child,
     required this.roleLabel,
+    this.compactHeader = false,
   });
 
   final int currentIndex;
@@ -33,24 +34,36 @@ class RoleScaffold extends StatelessWidget {
   final List<RoleNavItem> items;
   final Widget child;
   final String roleLabel;
+  final bool compactHeader;
 
   @override
   Widget build(BuildContext context) {
+    final titleStyle = compactHeader
+        ? Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)
+        : null;
+    final subtitleStyle = compactHeader
+        ? Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: AppColors.softGold,
+            fontWeight: FontWeight.w700,
+          )
+        : Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: AppColors.softGold);
+
     return LuxuryBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
+          toolbarHeight: compactHeader ? 64 : null,
           titleSpacing: 20,
           title: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Apart Hub'),
-              Text(
-                roleLabel,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: AppColors.softGold),
-              ),
+              Text('Apart Hub', style: titleStyle),
+              Text(roleLabel, style: subtitleStyle),
             ],
           ),
           actions: [
