@@ -27,6 +27,7 @@ class RoleScaffold extends StatelessWidget {
     required this.child,
     required this.roleLabel,
     this.compactHeader = false,
+    this.showHeader = true,
   });
 
   final int currentIndex;
@@ -35,6 +36,7 @@ class RoleScaffold extends StatelessWidget {
   final Widget child;
   final String roleLabel;
   final bool compactHeader;
+  final bool showHeader;
 
   @override
   Widget build(BuildContext context) {
@@ -55,29 +57,31 @@ class RoleScaffold extends StatelessWidget {
     return LuxuryBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          toolbarHeight: compactHeader ? 64 : null,
-          titleSpacing: 20,
-          title: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Apart Hub', style: titleStyle),
-              Text(roleLabel, style: subtitleStyle),
-            ],
-          ),
-          actions: [
-            IconButton(
-              tooltip: 'logout',
-              onPressed: () => context.go('/login'),
-              icon: const Icon(
-                Icons.exit_to_app_outlined,
-                color: AppColors.softGold,
-              ),
-            ),
-            const SizedBox(width: 8),
-          ],
-        ),
+        appBar: showHeader
+            ? AppBar(
+                toolbarHeight: compactHeader ? 64 : null,
+                titleSpacing: 20,
+                title: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Apart Hub', style: titleStyle),
+                    Text(roleLabel, style: subtitleStyle),
+                  ],
+                ),
+                actions: [
+                  IconButton(
+                    tooltip: 'logout',
+                    onPressed: () => context.go('/login'),
+                    icon: const Icon(
+                      Icons.exit_to_app_outlined,
+                      color: AppColors.softGold,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+              )
+            : null,
         body: SafeArea(top: false, child: child),
         bottomNavigationBar: ClipRRect(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_colors.dart';
@@ -385,6 +386,8 @@ class _HeroHeader extends StatelessWidget {
                   _NotificationButton(),
                   const SizedBox(width: 10),
                   _HeroEmergencyButton(onTap: onEmergency),
+                  const SizedBox(width: 10),
+                  _HeroLogoutButton(onTap: () => context.go('/login')),
                 ],
               ),
               const SizedBox(height: 18),
@@ -954,6 +957,27 @@ class _HeroEmergencyButton extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _HeroLogoutButton extends StatelessWidget {
+  const _HeroLogoutButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: 'Logout',
+      onPressed: onTap,
+      style: IconButton.styleFrom(
+        backgroundColor: Colors.white.withValues(alpha: 0.10),
+        foregroundColor: _homeGold,
+        minimumSize: const Size(44, 44),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.16)),
+      ),
+      icon: const Icon(Icons.exit_to_app_outlined),
     );
   }
 }
