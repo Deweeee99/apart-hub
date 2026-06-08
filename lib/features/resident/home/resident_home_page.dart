@@ -95,7 +95,7 @@ class ResidentDashboardPage extends StatelessWidget {
         color: _homeBackground,
         child: ListView(
           key: const ValueKey('resident-dashboard'),
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 128),
+          padding: const EdgeInsets.only(bottom: 130),
           children: [
             _HeroBillStack(
               resident: resident,
@@ -104,141 +104,166 @@ class ResidentDashboardPage extends StatelessWidget {
               onEmergency: showEmergency,
               onPayNow: () => onNavigate(2),
             ).animate().fadeIn(duration: 420.ms).moveY(begin: 16, end: 0),
-            const SizedBox(height: 10),
-            const _SectionTitle(
-              title: 'Quick Access',
-              actionLabel: '8 shortcuts',
-            ),
-            const SizedBox(height: 12),
-            _AdaptiveGrid(
-              minTileWidth: 92,
-              childAspectRatio: 0.94,
-              children: [
-                _QuickAccessCard(
-                  icon: Icons.person_search_outlined,
-                  title: 'QR Visitor',
-                  onTap: () => onNavigate(1),
-                ),
-                _QuickAccessCard(
-                  icon: Icons.directions_car_outlined,
-                  title: 'QR Parking',
-                  onTap: () => onNavigate(1),
-                ),
-                _QuickAccessCard(
-                  icon: Icons.inventory_2_outlined,
-                  title: 'QR Delivery',
-                  onTap: () => onNavigate(1),
-                ),
-                _QuickAccessCard(
-                  icon: Icons.qr_code_scanner_outlined,
-                  title: 'Digital Access',
-                  onTap: () => onNavigate(1),
-                ),
-                _QuickAccessCard(
-                  icon: Icons.event_available_outlined,
-                  title: 'Facility Booking',
-                  onTap: () => onNavigate(3),
-                ),
-                _QuickAccessCard(
-                  icon: Icons.handyman_outlined,
-                  title: 'Services',
-                  onTap: () => onNavigate(3),
-                ),
-                _QuickAccessCard(
-                  icon: Icons.local_shipping_outlined,
-                  title: 'Packages',
-                  onTap: showPackagesSoon,
-                ),
-                _QuickAccessCard(
-                  icon: Icons.forum_outlined,
-                  title: 'Community',
-                  onTap: () => onNavigate(4),
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  const _SectionTitle(
+                    title: 'Quick Access',
+                    actionLabel: '8 shortcuts',
+                  ),
+                  const SizedBox(height: 12),
+                  _AdaptiveGrid(
+                    minTileWidth: 92,
+                    childAspectRatio: 0.94,
+                    children: [
+                      _QuickAccessCard(
+                        icon: Icons.person_search_outlined,
+                        title: 'QR Visitor',
+                        onTap: () => onNavigate(1),
+                      ),
+                      _QuickAccessCard(
+                        icon: Icons.directions_car_outlined,
+                        title: 'QR Parking',
+                        onTap: () => onNavigate(1),
+                      ),
+                      _QuickAccessCard(
+                        icon: Icons.inventory_2_outlined,
+                        title: 'QR Delivery',
+                        onTap: () => onNavigate(1),
+                      ),
+                      _QuickAccessCard(
+                        icon: Icons.qr_code_scanner_outlined,
+                        title: 'Digital Access',
+                        onTap: () => onNavigate(1),
+                      ),
+                      _QuickAccessCard(
+                        icon: Icons.event_available_outlined,
+                        title: 'Facility Booking',
+                        onTap: () => onNavigate(3),
+                      ),
+                      _QuickAccessCard(
+                        icon: Icons.handyman_outlined,
+                        title: 'Services',
+                        onTap: () => onNavigate(3),
+                      ),
+                      _QuickAccessCard(
+                        icon: Icons.local_shipping_outlined,
+                        title: 'Packages',
+                        onTap: showPackagesSoon,
+                      ),
+                      _QuickAccessCard(
+                        icon: Icons.forum_outlined,
+                        title: 'Community',
+                        onTap: () => onNavigate(4),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 18),
-            _SummaryStrip(
-              residentStatus: resident.residencyStatus,
-              accessStatus: resident.accessStatus,
-              waitingPackages: waitingPackages,
-              activeBillLabel: _currency.format(totalOutstanding),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _SummaryStrip(
+                residentStatus: resident.residencyStatus,
+                accessStatus: resident.accessStatus,
+                waitingPackages: waitingPackages,
+                activeBillLabel: _currency.format(totalOutstanding),
+              ),
             ),
             const SizedBox(height: 20),
-            const _SectionTitle(title: "What's New", actionLabel: 'View All'),
-            const SizedBox(height: 12),
-            _AdaptiveGrid(
-              minTileWidth: 156,
-              childAspectRatio: 0.86,
-              children: [
-                _ActivityCard(
-                  icon: Icons.event_available_outlined,
-                  eyebrow: 'Upcoming Booking',
-                  title: upcomingBooking.facility,
-                  detail:
-                      '${_date.format(upcomingBooking.date)}\n${upcomingBooking.slot}',
-                  actionLabel: 'View',
-                  actionColor: const Color(0xFF3A94C9),
-                  onTap: () => onNavigate(3),
-                ),
-                _ActivityCard(
-                  icon: Icons.inventory_2_outlined,
-                  eyebrow: 'New Package Arrived',
-                  title: latestPackage.sender,
-                  detail:
-                      '${latestPackage.courier}\n${_date.format(latestPackage.arrivalTime)} ${_clock(latestPackage.arrivalTime)}',
-                  actionLabel: 'View Details',
-                  actionColor: _homeGold,
-                  onTap: showPackagesSoon,
-                ),
-                _ActivityCard(
-                  icon: Icons.handyman_outlined,
-                  eyebrow: 'Service Request',
-                  title: activeTicket.title,
-                  detail: 'Status\n${_ticketStatusLabel(activeTicket.status)}',
-                  actionLabel: 'Track',
-                  actionColor: AppColors.success,
-                  onTap: () => onNavigate(3),
-                ),
-                _ActivityCard(
-                  icon: Icons.campaign_outlined,
-                  eyebrow: 'Community Update',
-                  title: latestAnnouncement.title,
-                  detail:
-                      '${_date.format(latestAnnouncement.publishedAt)}\n${latestAnnouncement.message}',
-                  actionLabel: 'Read More',
-                  actionColor: const Color(0xFF3A94C9),
-                  onTap: () => onNavigate(4),
-                ),
-                _ActivityCard(
-                  icon: Icons.local_cafe_outlined,
-                  eyebrow: 'Tenant Promo',
-                  title: promo.merchant,
-                  detail: '${promo.item}\n${promo.priceLabel}',
-                  badgeText: promo.badge,
-                  actionLabel: 'Order Now',
-                  actionColor: _homeGold,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Tenant promo ordering is simulated.'),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  const _SectionTitle(
+                    title: "What's New",
+                    actionLabel: 'View All',
+                  ),
+                  const SizedBox(height: 12),
+                  _AdaptiveGrid(
+                    minTileWidth: 156,
+                    childAspectRatio: 0.86,
+                    children: [
+                      _ActivityCard(
+                        icon: Icons.event_available_outlined,
+                        eyebrow: 'Upcoming Booking',
+                        title: upcomingBooking.facility,
+                        detail:
+                            '${_date.format(upcomingBooking.date)}\n${upcomingBooking.slot}',
+                        actionLabel: 'View',
+                        actionColor: const Color(0xFF3A94C9),
+                        onTap: () => onNavigate(3),
                       ),
-                    );
-                  },
-                ),
-                _ActivityCard(
-                  icon: Icons.support_agent_outlined,
-                  eyebrow: 'Emergency Contact',
-                  title: emergencyContact.securityLabel,
-                  detail:
-                      '${emergencyContact.securityPhone}\n${emergencyContact.medicalLabel}\n${emergencyContact.medicalPhone}',
-                  actionLabel: 'Call Now',
-                  actionColor: AppColors.danger,
-                  onTap: showEmergency,
-                ),
-              ],
+                      _ActivityCard(
+                        icon: Icons.inventory_2_outlined,
+                        eyebrow: 'New Package Arrived',
+                        title: latestPackage.sender,
+                        detail:
+                            '${latestPackage.courier}\n${_date.format(latestPackage.arrivalTime)} ${_clock(latestPackage.arrivalTime)}',
+                        actionLabel: 'View Details',
+                        actionColor: _homeGold,
+                        onTap: showPackagesSoon,
+                      ),
+                      _ActivityCard(
+                        icon: Icons.handyman_outlined,
+                        eyebrow: 'Service Request',
+                        title: activeTicket.title,
+                        detail:
+                            'Status\n${_ticketStatusLabel(activeTicket.status)}',
+                        actionLabel: 'Track',
+                        actionColor: AppColors.success,
+                        onTap: () => onNavigate(3),
+                      ),
+                      _ActivityCard(
+                        icon: Icons.campaign_outlined,
+                        eyebrow: 'Community Update',
+                        title: latestAnnouncement.title,
+                        detail:
+                            '${_date.format(latestAnnouncement.publishedAt)}\n${latestAnnouncement.message}',
+                        actionLabel: 'Read More',
+                        actionColor: const Color(0xFF3A94C9),
+                        onTap: () => onNavigate(4),
+                      ),
+                      _ActivityCard(
+                        icon: Icons.local_cafe_outlined,
+                        eyebrow: 'Tenant Promo',
+                        title: promo.merchant,
+                        detail: '${promo.item}\n${promo.priceLabel}',
+                        badgeText: promo.badge,
+                        actionLabel: 'Order Now',
+                        actionColor: _homeGold,
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Tenant promo ordering is simulated.',
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      _ActivityCard(
+                        icon: Icons.support_agent_outlined,
+                        eyebrow: 'Emergency Contact',
+                        title: emergencyContact.securityLabel,
+                        detail:
+                            '${emergencyContact.securityPhone}\n${emergencyContact.medicalLabel}\n${emergencyContact.medicalPhone}',
+                        actionLabel: 'Call Now',
+                        actionColor: AppColors.danger,
+                        onTap: showEmergency,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 18),
-            _EmergencyPanel(onPressed: showEmergency),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _EmergencyPanel(onPressed: showEmergency),
+            ),
           ],
         ),
       ),
@@ -264,17 +289,17 @@ class _HeroBillStack extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 318,
+      height: 352,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           _HeroHeader(resident: resident, onEmergency: onEmergency),
           Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
+            left: 20,
+            right: 20,
+            top: 238,
             child: Transform.translate(
-              offset: const Offset(0, 14),
+              offset: const Offset(0, -4),
               child: _OutstandingBillCard(
                 totalOutstanding: totalOutstanding,
                 nearestDue: nearestDue,
@@ -297,16 +322,19 @@ class _HeroHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 228,
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 54),
+      width: double.infinity,
+      height: 292,
+      padding: const EdgeInsets.fromLTRB(28, 34, 28, 92),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [_homeNavy, _homeBlue],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(34),
-        border: Border.all(color: _homeGold.withValues(alpha: 0.18)),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(34),
+          bottomRight: Radius.circular(34),
+        ),
         boxShadow: [
           BoxShadow(
             color: _homeNavy.withValues(alpha: 0.20),
