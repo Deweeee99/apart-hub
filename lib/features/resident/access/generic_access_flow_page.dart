@@ -235,8 +235,12 @@ class _GenericAccessFlowPageState extends State<GenericAccessFlowPage> {
             const SizedBox(height: 8),
             TextField(
               controller: _controllers[field],
+              style: const TextStyle(
+                color: Color(0xFF071B34),
+              ),
               decoration: InputDecoration(
                 hintText: field,
+                hintStyle: const TextStyle(color: Color(0xFF071B34)),
                 filled: true,
                 fillColor: const Color(0xFFFFFCF7),
                 contentPadding: const EdgeInsets.symmetric(

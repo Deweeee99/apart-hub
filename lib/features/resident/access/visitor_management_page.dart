@@ -930,8 +930,14 @@ class _PremiumTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
+      style: const TextStyle(
+        color: Color(0xFF071B34),
+      ),
       decoration: InputDecoration(
         hintText: hintText,
+        hintStyle: const TextStyle(
+          color: Color(0xFF071B34),
+        ),
         prefixIcon: Icon(icon, color: _visitorGold),
         filled: true,
         fillColor: const Color(0xFFFFFCF7),
