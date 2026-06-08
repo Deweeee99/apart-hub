@@ -201,6 +201,70 @@ class CommunityPost {
   final String description;
 }
 
+class CommunityAnnouncementItem {
+  const CommunityAnnouncementItem({
+    required this.title,
+    required this.message,
+    required this.fullMessage,
+    required this.category,
+    required this.date,
+    required this.priority,
+    required this.iconType,
+    required this.affectedArea,
+    required this.actionNote,
+  });
+
+  final String title;
+  final String message;
+  final String fullMessage;
+  final String category;
+  final String date;
+  final String priority;
+  final String iconType;
+  final String affectedArea;
+  final String actionNote;
+}
+
+class CommunityEventItem {
+  const CommunityEventItem({
+    required this.title,
+    required this.description,
+    required this.date,
+    required this.time,
+    required this.location,
+    required this.host,
+    required this.capacity,
+    required this.status,
+    required this.iconType,
+  });
+
+  final String title;
+  final String description;
+  final String date;
+  final String time;
+  final String location;
+  final String host;
+  final String capacity;
+  final String status;
+  final String iconType;
+}
+
+class CommunityArchiveItem {
+  const CommunityArchiveItem({
+    required this.title,
+    required this.date,
+    required this.category,
+    required this.summary,
+    required this.iconType,
+  });
+
+  final String title;
+  final String date;
+  final String category;
+  final String summary;
+  final String iconType;
+}
+
 class SecurityIncident {
   const SecurityIncident({
     required this.id,

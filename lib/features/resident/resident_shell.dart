@@ -9,6 +9,7 @@ import '../../core/widgets/emergency_button.dart';
 import '../../core/widgets/role_scaffold.dart';
 import '../../core/widgets/status_badge.dart';
 import 'billing_payment_page.dart';
+import 'community/community_page.dart';
 import 'digital_access_page.dart';
 import 'services/resident_services_page.dart';
 
@@ -255,88 +256,6 @@ class ResidentDashboardPage extends StatelessWidget {
   }
 }
 
-class CommunityPage extends StatelessWidget {
-  const CommunityPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final categories = ['Forum', 'Marketplace', 'Lost & Found', 'Events'];
-
-    return DefaultTabController(
-      length: categories.length,
-      child: _ResidentSurface(
-        child: Column(
-          key: const ValueKey('resident-community'),
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const _ResidentHeader(
-                    title: 'Community Hub',
-                    subtitle: 'Stay connected, informed, and engaged',
-                    icon: Icons.forum_outlined,
-                  ),
-                  const SizedBox(height: 14),
-                  const _CommunityFeatureRow(),
-                  const SizedBox(height: 14),
-                  _WhitePremiumCard(
-                    padding: const EdgeInsets.all(6),
-                    child: TabBar(
-                      isScrollable: true,
-                      dividerColor: Colors.transparent,
-                      indicator: BoxDecoration(
-                        color: _residentSoftGold,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: _residentGold.withValues(alpha: 0.32),
-                        ),
-                      ),
-                      labelColor: _residentNavy,
-                      unselectedLabelColor: _residentMuted,
-                      labelStyle: Theme.of(context).textTheme.labelLarge
-                          ?.copyWith(fontWeight: FontWeight.w900),
-                      tabAlignment: TabAlignment.start,
-                      tabs: [
-                        for (final category in categories)
-                          Tab(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
-                              child: Text(category),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  for (final category in categories)
-                    ListView(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
-                      children: [
-                        for (final post in DemoData.communityPosts.where(
-                          (item) => item.category == category,
-                        ))
-                          _CommunityPostCard(post: post),
-                      ],
-                    ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _ResidentSurface extends StatelessWidget {
   const _ResidentSurface({required this.child});
 
@@ -385,20 +304,17 @@ class _WhitePremiumCard extends StatelessWidget {
   const _WhitePremiumCard({
     required this.child,
     this.padding = const EdgeInsets.all(18),
-    this.margin = EdgeInsets.zero,
     this.onTap,
   });
 
   final Widget child;
   final EdgeInsetsGeometry padding;
-  final EdgeInsetsGeometry margin;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final content = Container(
       width: double.infinity,
-      margin: margin,
       padding: padding,
       decoration: BoxDecoration(
         color: _residentCard,
@@ -423,54 +339,6 @@ class _WhitePremiumCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         onTap: onTap,
         child: content,
-      ),
-    );
-  }
-}
-
-class _ResidentHeader extends StatelessWidget {
-  const _ResidentHeader({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-  });
-
-  final String title;
-  final String subtitle;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return _WhitePremiumCard(
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        children: [
-          _GoldIcon(icon: icon, size: 48),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: _residentNavy,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: _residentMuted,
-                    height: 1.35,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -1022,152 +890,6 @@ class _EmergencyPanel extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           EmergencyButton(onPressed: onPressed),
-        ],
-      ),
-    );
-  }
-}
-
-class _CommunityFeatureRow extends StatelessWidget {
-  const _CommunityFeatureRow();
-
-  @override
-  Widget build(BuildContext context) {
-    final items = [
-      (Icons.campaign_outlined, 'Announcements'),
-      (Icons.event_outlined, 'Events'),
-      (Icons.chat_bubble_outline, 'Forum'),
-      (Icons.folder_copy_outlined, 'Archive'),
-    ];
-    return SizedBox(
-      height: 90,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: items.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 10),
-        itemBuilder: (context, index) {
-          return SizedBox(
-            width: 126,
-            child: _WhitePremiumCard(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _GoldIcon(icon: items[index].$1, size: 34),
-                  const Spacer(),
-                  Text(
-                    items[index].$2,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: _residentNavy,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _CommunityPostCard extends StatelessWidget {
-  const _CommunityPostCard({required this.post});
-
-  final CommunityPost post;
-
-  @override
-  Widget build(BuildContext context) {
-    final icon = switch (post.category) {
-      'Marketplace' => Icons.sell_outlined,
-      'Lost & Found' => Icons.manage_search_outlined,
-      'Events' => Icons.celebration_outlined,
-      _ => Icons.chat_bubble_outline,
-    };
-    return _WhitePremiumCard(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              _GoldIcon(icon: icon, size: 42),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      post.author,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: _residentNavy,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      post.category,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(color: _residentMuted),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(Icons.more_horiz, color: _residentMuted),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Text(
-            post.title,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: _residentNavy,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            post.description,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: _residentMuted,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Icon(
-                Icons.chat_bubble_outline,
-                size: 17,
-                color: _residentMuted.withValues(alpha: 0.85),
-              ),
-              const SizedBox(width: 5),
-              Text(
-                '12',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: _residentMuted,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Icon(
-                Icons.favorite_border,
-                size: 17,
-                color: _residentMuted.withValues(alpha: 0.85),
-              ),
-              const SizedBox(width: 5),
-              Text(
-                '24',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: _residentMuted,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );

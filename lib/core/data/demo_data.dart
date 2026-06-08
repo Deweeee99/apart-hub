@@ -281,6 +281,180 @@ class DemoData {
     ),
   ];
 
+  static const communityAnnouncements = [
+    CommunityAnnouncementItem(
+      title: 'Maintenance Notice',
+      message:
+          'Elevator maintenance will be conducted on 07 Jun 2026, 10:00 - 14:00.',
+      fullMessage:
+          'Management will conduct preventive elevator maintenance on 07 Jun 2026 from 10:00 to 14:00. Please use the service elevator during the maintenance window and plan your activities accordingly.',
+      category: 'Maintenance',
+      date: '05 Jun 2026',
+      priority: 'Important',
+      iconType: 'maintenance',
+      affectedArea: 'Tower A residential elevator',
+      actionNote: 'Use service elevator and allow additional travel time.',
+    ),
+    CommunityAnnouncementItem(
+      title: 'Water Shutdown',
+      message:
+          'Water supply will be temporarily unavailable on 06 Jun 2026, 22:00 - 04:00.',
+      fullMessage:
+          'A scheduled water system inspection will require temporary water shutdown from 06 Jun 2026 at 22:00 until 07 Jun 2026 at 04:00.',
+      category: 'Important',
+      date: '04 Jun 2026',
+      priority: 'Important',
+      iconType: 'water',
+      affectedArea: 'Tower A and Tower B',
+      actionNote: 'Store enough water before the maintenance window.',
+    ),
+    CommunityAnnouncementItem(
+      title: 'Facility Closure',
+      message: 'Swimming Pool will be closed on 08 Jun 2026 for maintenance.',
+      fullMessage:
+          'The swimming pool and pool deck will be closed for monthly deep cleaning and water treatment on 08 Jun 2026.',
+      category: 'Maintenance',
+      date: '04 Jun 2026',
+      priority: 'General',
+      iconType: 'pool',
+      affectedArea: 'Swimming Pool, Level 5',
+      actionNote: 'Facility access resumes after management approval.',
+    ),
+    CommunityAnnouncementItem(
+      title: 'Fire Drill Notice',
+      message: 'Tower A evacuation drill starts at 10:00 next Tuesday.',
+      fullMessage:
+          'Residents are invited to participate in a fire evacuation drill to improve emergency readiness across Tower A.',
+      category: 'Important',
+      date: '02 Jun 2026',
+      priority: 'Important',
+      iconType: 'fire',
+      affectedArea: 'Tower A',
+      actionNote: 'Follow security team instructions during the drill.',
+    ),
+    CommunityAnnouncementItem(
+      title: 'Building Cleaning',
+      message: 'Facade and corridor cleaning will run from 09-12 Jun 2026.',
+      fullMessage:
+          'Routine cleaning will be performed in shared corridors, lift lobbies, and selected facade areas from 09-12 Jun 2026.',
+      category: 'General',
+      date: '01 Jun 2026',
+      priority: 'General',
+      iconType: 'cleaning',
+      affectedArea: 'Shared corridors and facade',
+      actionNote: 'Keep personal items away from corridor areas.',
+    ),
+    CommunityAnnouncementItem(
+      title: 'Ramadan Event',
+      message: 'Resident iftar gathering will be held at the Sky Lounge.',
+      fullMessage:
+          'Management invites residents to a community iftar gathering with light dinner and acoustic entertainment at Sky Lounge.',
+      category: 'General',
+      date: '20 May 2026',
+      priority: 'General',
+      iconType: 'event',
+      affectedArea: 'Sky Lounge',
+      actionNote: 'Register interest through the community office.',
+    ),
+  ];
+
+  static const communityEvents = [
+    CommunityEventItem(
+      title: 'Yoga Class',
+      description: 'Morning wellness session for residents of all levels.',
+      date: '14 Jun 2026',
+      time: '07:00 - 08:00',
+      location: 'Sky Lounge, Level 20',
+      host: 'Wellness Team',
+      capacity: '24 residents',
+      status: 'Upcoming',
+      iconType: 'wellness',
+    ),
+    CommunityEventItem(
+      title: 'Community Gathering',
+      description:
+          'Casual gathering with refreshments and resident networking.',
+      date: '21 Jun 2026',
+      time: '16:00 - 18:00',
+      location: 'Function Room',
+      host: 'Management Office',
+      capacity: '60 residents',
+      status: 'Upcoming',
+      iconType: 'gathering',
+    ),
+    CommunityEventItem(
+      title: 'Kids Activity',
+      description: 'Creative workshop and supervised games for children.',
+      date: '28 Jun 2026',
+      time: '10:00 - 12:00',
+      location: 'Kids Room, Level 5',
+      host: 'Family Club',
+      capacity: '18 children',
+      status: 'Ongoing',
+      iconType: 'kids',
+    ),
+    CommunityEventItem(
+      title: 'Blood Donation',
+      description: 'Community health drive in partnership with local clinic.',
+      date: '18 May 2026',
+      time: '09:00 - 13:00',
+      location: 'Main Lobby',
+      host: 'Health Partner',
+      capacity: '80 donors',
+      status: 'Past',
+      iconType: 'health',
+    ),
+    CommunityEventItem(
+      title: 'Ramadan Event',
+      description: 'Community iftar and evening gathering at Sky Lounge.',
+      date: '20 May 2026',
+      time: '17:30 - 20:00',
+      location: 'Sky Lounge',
+      host: 'Management Office',
+      capacity: '90 residents',
+      status: 'Past',
+      iconType: 'ramadan',
+    ),
+  ];
+
+  static const communityArchive = [
+    CommunityArchiveItem(
+      title: 'Fire Drill Notice',
+      date: '28 May 2026',
+      category: 'Announcements',
+      summary: 'Emergency readiness announcement for Tower A residents.',
+      iconType: 'fire',
+    ),
+    CommunityArchiveItem(
+      title: 'Gym Closure',
+      date: '25 May 2026',
+      category: 'Announcements',
+      summary: 'Temporary gym closure for equipment maintenance.',
+      iconType: 'gym',
+    ),
+    CommunityArchiveItem(
+      title: 'Ramadan Event',
+      date: '20 May 2026',
+      category: 'Events',
+      summary: 'Community iftar gathering recap and attendance notes.',
+      iconType: 'ramadan',
+    ),
+    CommunityArchiveItem(
+      title: 'Blood Donation',
+      date: '18 May 2026',
+      category: 'Events',
+      summary: 'Health drive event recap with resident participation.',
+      iconType: 'health',
+    ),
+    CommunityArchiveItem(
+      title: 'Building Cleaning',
+      date: '16 May 2026',
+      category: 'Forum',
+      summary: 'Resident discussion about corridor and facade cleaning.',
+      iconType: 'cleaning',
+    ),
+  ];
+
   static const incidents = [
     SecurityIncident(
       id: 'INC-2401',

@@ -117,7 +117,6 @@ class _FacilityBookingPageState extends State<FacilityBookingPage> {
 
   Widget _buildSelectFacility() {
     final facilities = const [
-      ('Kolam Renang', 'Relax and unwind', Icons.pool_outlined),
       ('Gym', 'Stay fit and healthy', Icons.fitness_center_outlined),
       ('Tennis Court', 'Book your game time', Icons.sports_tennis_outlined),
       ('Meeting Room', 'For meetings and events', Icons.meeting_room_outlined),
