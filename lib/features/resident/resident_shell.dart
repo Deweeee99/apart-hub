@@ -10,7 +10,7 @@ import '../../core/widgets/role_scaffold.dart';
 import '../../core/widgets/status_badge.dart';
 import 'billing_payment_page.dart';
 import 'community/community_page.dart';
-import 'digital_access_page.dart';
+import 'access/digital_access_page.dart';
 import 'services/resident_services_page.dart';
 
 final _currency = NumberFormat.currency(
