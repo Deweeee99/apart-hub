@@ -7,7 +7,6 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/data/demo_data.dart';
 import '../../../core/models/app_models.dart';
 import '../../../core/widgets/emergency_button.dart';
-import '../../../core/widgets/status_badge.dart';
 import '../../../core/widgets/white_premium_card.dart';
 
 final _currency = NumberFormat.currency(
@@ -17,7 +16,7 @@ final _currency = NumberFormat.currency(
 );
 final _date = DateFormat('d MMM yyyy', 'id_ID');
 
-const _homeBackground = Color(0xFFFAF8F2);
+const _homeSurface = Color(0xFFF8F5EF);
 const _homeNavy = Color(0xFF071B34);
 const _homeBlue = Color(0xFF173A67);
 const _homeGold = Color(0xFFC08A1A);
@@ -92,7 +91,7 @@ class ResidentDashboardPage extends StatelessWidget {
         ).textTheme.apply(bodyColor: _homeNavy, displayColor: _homeNavy),
       ),
       child: ColoredBox(
-        color: _homeBackground,
+        color: _homeSurface,
         child: ListView(
           key: const ValueKey('resident-dashboard'),
           padding: const EdgeInsets.only(bottom: 130),
@@ -104,6 +103,7 @@ class ResidentDashboardPage extends StatelessWidget {
               onEmergency: showEmergency,
               onPayNow: () => onNavigate(2),
             ).animate().fadeIn(duration: 420.ms).moveY(begin: 16, end: 0),
+            const SizedBox(height: 26),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
@@ -289,17 +289,24 @@ class _HeroBillStack extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 352,
+      height: 388,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           _HeroHeader(resident: resident, onEmergency: onEmergency),
+          const Positioned(
+            left: 0,
+            right: 0,
+            top: 188,
+            height: 96,
+            child: IgnorePointer(child: _HeroFadeTransition()),
+          ),
           Positioned(
             left: 20,
             right: 20,
-            top: 238,
+            top: 224,
             child: Transform.translate(
-              offset: const Offset(0, -4),
+              offset: const Offset(0, -2),
               child: _OutstandingBillCard(
                 totalOutstanding: totalOutstanding,
                 nearestDue: nearestDue,
@@ -323,8 +330,8 @@ class _HeroHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 292,
-      padding: const EdgeInsets.fromLTRB(28, 34, 28, 92),
+      height: 274,
+      padding: const EdgeInsets.fromLTRB(28, 30, 28, 86),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [_homeNavy, _homeBlue],
@@ -332,8 +339,8 @@ class _HeroHeader extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
         borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(34),
-          bottomRight: Radius.circular(34),
+          bottomLeft: Radius.circular(12),
+          bottomRight: Radius.circular(12),
         ),
         boxShadow: [
           BoxShadow(
@@ -363,11 +370,11 @@ class _HeroHeader extends StatelessWidget {
             ),
           ),
           Positioned(
-            bottom: -26,
-            left: 110,
+            bottom: -18,
+            left: 104,
             child: Container(
-              width: 180,
-              height: 120,
+              width: 184,
+              height: 110,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(120),
                 gradient: LinearGradient(
@@ -436,6 +443,27 @@ class _HeroHeader extends StatelessWidget {
   }
 }
 
+class _HeroFadeTransition extends StatelessWidget {
+  const _HeroFadeTransition();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.transparent,
+            _homeSurface.withValues(alpha: 0.84),
+            _homeSurface,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _OutstandingBillCard extends StatelessWidget {
   const _OutstandingBillCard({
     required this.totalOutstanding,
@@ -455,22 +483,22 @@ class _OutstandingBillCard extends StatelessWidget {
     final badgeLabel = totalOutstanding > 0 ? 'Due Soon' : 'Paid';
 
     return WhitePremiumCard(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            width: 58,
-            height: 58,
+            width: 54,
+            height: 54,
             decoration: BoxDecoration(
               color: _homeSoftGold,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(color: _homeGold.withValues(alpha: 0.25)),
             ),
             child: const Icon(
               Icons.receipt_long_outlined,
               color: _homeGold,
-              size: 29,
+              size: 26,
             ),
           ),
           const SizedBox(width: 14),
@@ -483,46 +511,49 @@ class _OutstandingBillCard extends StatelessWidget {
                     Flexible(
                       child: Text(
                         'Outstanding Bill',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              color: _homeNavy,
-                              fontWeight: FontWeight.w900,
-                            ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: _homeNavy,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
-                    StatusBadge(status: badgeLabel),
+                    _BillStatusPill(label: badgeLabel),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Text(
                   _currency.format(totalOutstanding),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: _homeNavy,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 3),
                 Text(
                   dueLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: Theme.of(
                     context,
-                  ).textTheme.bodyMedium?.copyWith(color: _homeMuted),
+                  ).textTheme.bodySmall?.copyWith(color: _homeMuted),
                 ),
               ],
             ),
           ),
           const SizedBox(width: 12),
           SizedBox(
-            height: 46,
+            height: 42,
             child: ElevatedButton(
               onPressed: onPayNow,
               style: ElevatedButton.styleFrom(
                 backgroundColor: _homeGold,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 18),
+                padding: const EdgeInsets.symmetric(horizontal: 22),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -535,6 +566,31 @@ class _OutstandingBillCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _BillStatusPill extends StatelessWidget {
+  const _BillStatusPill({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0F7FF),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: const Color(0xFFC9E1FF)),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+          color: const Color(0xFF60A5FA),
+          fontWeight: FontWeight.w800,
+        ),
       ),
     );
   }
