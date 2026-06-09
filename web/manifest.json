@@ -1,11 +1,11 @@
 {
-    "name": "Apartemen Meikarta",
-    "short_name": "Meikarta",
+    "name": "Apart Hub",
+    "short_name": "Apart Hub",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#05070D",
     "theme_color": "#D4AF37",
-    "description": "Apartemen Meikarta integrated apartment management platform demo.",
+    "description": "Apart Hub integrated apartment management platform demo.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
