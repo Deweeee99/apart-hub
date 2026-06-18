@@ -115,6 +115,88 @@ class DemoData {
     ),
   ];
 
+  static final securityVisitorPasses = [
+    SecurityVisitorPass(
+      code: 'VST-2026-00125',
+      visitorName: 'Ahmad Wijaya',
+      visitorType: 'Guest',
+      residentName: 'Rizky Pratama',
+      unit: 'A-1203',
+      phoneNumber: '0812 3456 7890',
+      vehicleNumber: 'B 1234 XYZ',
+      startTime: DateTime(2026, 5, 20, 10),
+      endTime: DateTime(2026, 5, 20, 14),
+      status: 'Valid',
+    ),
+    SecurityVisitorPass(
+      code: 'VST-2026-00126',
+      visitorName: 'Maya Santoso',
+      visitorType: 'Family',
+      residentName: 'Jonathan Wijaya',
+      unit: 'A-1808',
+      phoneNumber: '0813 2200 1188',
+      vehicleNumber: 'B 8080 MAY',
+      startTime: DateTime(2026, 5, 18, 9),
+      endTime: DateTime(2026, 5, 18, 12),
+      status: 'Expired',
+    ),
+    SecurityVisitorPass(
+      code: 'VST-2026-00127',
+      visitorName: 'Dimas Putra',
+      visitorType: 'Technician',
+      residentName: 'Amelia Tan',
+      unit: 'B-2201',
+      phoneNumber: '0817 4444 2201',
+      vehicleNumber: 'B 2290 TAN',
+      startTime: DateTime(2026, 5, 20, 13),
+      endTime: DateTime(2026, 5, 20, 16),
+      status: 'Checked In',
+    ),
+    SecurityVisitorPass(
+      code: 'VST-2026-00128',
+      visitorName: 'Reno Aditya',
+      visitorType: 'Vendor',
+      residentName: 'Richard Halim',
+      unit: 'C-0909',
+      phoneNumber: '0818 9900 0909',
+      vehicleNumber: 'B 1900 RNO',
+      startTime: DateTime(2026, 5, 19, 15),
+      endTime: DateTime(2026, 5, 19, 17),
+      status: 'Denied',
+    ),
+  ];
+
+  static final securityAccessLogs = [
+    SecurityAccessLog(
+      visitorName: 'Ahmad Wijaya',
+      unit: 'A-1203',
+      timestamp: DateTime(2026, 5, 20, 9, 52),
+      status: 'Valid',
+      code: 'VST-2026-00125',
+    ),
+    SecurityAccessLog(
+      visitorName: 'Dimas Putra',
+      unit: 'B-2201',
+      timestamp: DateTime(2026, 5, 20, 13, 18),
+      status: 'Checked In',
+      code: 'VST-2026-00127',
+    ),
+    SecurityAccessLog(
+      visitorName: 'Reno Aditya',
+      unit: 'C-0909',
+      timestamp: DateTime(2026, 5, 19, 15, 6),
+      status: 'Denied',
+      code: 'VST-2026-00128',
+    ),
+    SecurityAccessLog(
+      visitorName: 'Maya Santoso',
+      unit: 'A-1808',
+      timestamp: DateTime(2026, 5, 18, 12, 20),
+      status: 'Expired',
+      code: 'VST-2026-00126',
+    ),
+  ];
+
   static const tickets = [
     ServiceTicket(
       id: 'SR-2401',

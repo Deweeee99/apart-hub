@@ -94,6 +94,63 @@ class VisitorPass {
   }
 }
 
+class SecurityVisitorPass {
+  const SecurityVisitorPass({
+    required this.code,
+    required this.visitorName,
+    required this.visitorType,
+    required this.residentName,
+    required this.unit,
+    required this.phoneNumber,
+    required this.vehicleNumber,
+    required this.startTime,
+    required this.endTime,
+    required this.status,
+  });
+
+  final String code;
+  final String visitorName;
+  final String visitorType;
+  final String residentName;
+  final String unit;
+  final String phoneNumber;
+  final String vehicleNumber;
+  final DateTime startTime;
+  final DateTime endTime;
+  final String status;
+
+  SecurityVisitorPass copyWith({String? status}) {
+    return SecurityVisitorPass(
+      code: code,
+      visitorName: visitorName,
+      visitorType: visitorType,
+      residentName: residentName,
+      unit: unit,
+      phoneNumber: phoneNumber,
+      vehicleNumber: vehicleNumber,
+      startTime: startTime,
+      endTime: endTime,
+      status: status ?? this.status,
+    );
+  }
+}
+
+class SecurityAccessLog {
+  const SecurityAccessLog({
+    required this.visitorName,
+    required this.unit,
+    required this.timestamp,
+    required this.status,
+    required this.code,
+  });
+
+  final String visitorName;
+  final String unit;
+  final DateTime timestamp;
+  final String status;
+  final String code;
+}
+
 class ServiceTicket {
   const ServiceTicket({
     required this.id,
