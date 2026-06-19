@@ -8,6 +8,7 @@ import '../../../core/data/demo_data.dart';
 import '../../../core/models/app_models.dart';
 import '../../../core/widgets/emergency_button.dart';
 import '../../../core/widgets/white_premium_card.dart';
+import '../marketplace/tenant_marketplace_page.dart';
 
 final _currency = NumberFormat.currency(
   locale: 'id_ID',
@@ -128,9 +129,15 @@ class ResidentDashboardPage extends StatelessWidget {
                         onTap: () => onNavigate(1),
                       ),
                       _QuickAccessCard(
-                        icon: Icons.inventory_2_outlined,
-                        title: 'QR Delivery',
-                        onTap: () => onNavigate(1),
+                        icon: Icons.storefront_outlined,
+                        title: 'Marketplace',
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const TenantMarketplacePage(),
+                            ),
+                          );
+                        },
                       ),
                       _QuickAccessCard(
                         icon: Icons.qr_code_scanner_outlined,
